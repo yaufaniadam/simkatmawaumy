@@ -115,11 +115,20 @@ class Pengajuan extends Mahasiswa_Controller
 			];
 			$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
 		}
-		// $nama = $this->input->post('nama');
+	}
 
-		// echo json_encode(
-		// 	$this->db->query("SELECT * FROM V_Mahasiswa WHERE FULLNAME LIKE '%amalia%' ")->result_array()
-		// );
+	public function getPembimbing()
+	{
+		$search = $this->input->post('search');
+		$result_anggota = $this->pengajuan_model->getPembimbing($search);
+
+		foreach ($result_anggota as $anggota) {
+			$selectajax[] = [
+				'id' => $anggota['STUDENTID'],
+				'text' => $anggota['FULLNAME']
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
+		}
 	}
 
 	public function tambah($pengajuan_id = 0)
@@ -209,53 +218,53 @@ class Pengajuan extends Mahasiswa_Controller
 	//   }
 	// }
 
-	// public function doupload()
-	// {
-	//   header('Content-type:application/json;charset=utf-8');
-	//   $upload_path = 'uploads/dokumen';
+	public function doupload()
+	{
+		header('Content-type:application/json;charset=utf-8');
+		$upload_path = 'uploads/dokumen';
 
-	//   if (!is_dir($upload_path)) {
-	//     mkdir($upload_path, 0777, TRUE);
-	//   }
+		if (!is_dir($upload_path)) {
+			mkdir($upload_path, 0777, TRUE);
+		}
 
-	//   $config = array(
-	//     'upload_path' => $upload_path,
-	//     'allowed_types' => "jpg|png",
-	//     'overwrite' => FALSE,
-	//   );
+		$config = array(
+			'upload_path' => $upload_path,
+			'allowed_types' => "jpg|png",
+			'overwrite' => FALSE,
+		);
 
-	//   $this->load->library('upload', $config);
+		$this->load->library('upload', $config);
 
-	//   if (!$this->upload->do_upload('file')) {
-	//     $error = array('error' => $this->upload->display_errors());
+		if (!$this->upload->do_upload('file')) {
+			$error = array('error' => $this->upload->display_errors());
 
-	//     echo json_encode([
-	//       'status' => 'error',
-	//       'message' => $error
-	//     ]);
-	//   } else {
-	//     $data = $this->upload->data();
+			echo json_encode([
+				'status' => 'error',
+				'message' => $error
+			]);
+		} else {
+			$data = $this->upload->data();
 
-	//     $this->_create_thumbs($data['file_name']);
+			$this->_create_thumbs($data['file_name']);
 
-	//     $result = $this->db->insert(
-	//       'media',
-	//       array(
-	//         'id_user' => $this->session->userdata('user_id'),
-	//         'file' =>  $upload_path . '/' . $data['file_name'],
-	//         'thumb' =>  $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext']
-	//       )
-	//     );
+			$result = $this->db->insert(
+				'Tr_Media',
+				array(
+					'nim' => $this->session->userdata('studentid'),
+					'file' =>  $upload_path . '/' . $data['file_name'],
+					'thumb' =>  $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext']
+				)
+			);
 
-	//     echo json_encode([
-	//       'status' => 'Ok',
-	//       'id' => $this->db->insert_id(),
-	//       // 'path' => $upload_path . '/' . $data['file_name']
-	//       'thumb' => $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'],
-	//       'orig' => $upload_path . '/' . $data['file_name']
-	//     ]);
-	//   }
-	// }
+			echo json_encode([
+				'status' => 'Ok',
+				'id' => $this->db->insert_id(),
+				// 'path' => $upload_path . '/' . $data['file_name']
+				'thumb' => $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'],
+				'orig' => $upload_path . '/' . $data['file_name']
+			]);
+		}
+	}
 
 	// public function tampil_surat($id_surat)
 	// {
@@ -296,27 +305,27 @@ class Pengajuan extends Mahasiswa_Controller
 	//   $mpdf->Output('Surat-' . $kategori . '-' . $nim . '.pdf', 'D');
 	// }
 
-	// function _create_thumbs($upload_data)
-	// {
-	//   // Image resizing config
-	//   $upload_data = $this->upload->data();
-	//   $image_config["image_library"] = "gd2";
-	//   $image_config["source_image"] = $upload_data["full_path"];
-	//   $image_config['create_thumb'] = true;
-	//   $image_config['maintain_ratio'] = TRUE;
-	//   $image_config['thumb_marker'] = "_thumb";
-	//   $image_config['new_image'] = $upload_data["file_path"];
-	//   $image_config['quality'] = "100%";
-	//   $image_config['width'] = 320;
-	//   $image_config['height'] = 240;
-	//   $dim = (intval($upload_data["image_width"]) / intval($upload_data["image_height"])) - ($image_config['width'] / $image_config['height']);
-	//   $image_config['master_dim'] = ($dim > 0) ? "height" : "width";
+	function _create_thumbs($upload_data)
+	{
+		// Image resizing config
+		$upload_data = $this->upload->data();
+		$image_config["image_library"] = "gd2";
+		$image_config["source_image"] = $upload_data["full_path"];
+		$image_config['create_thumb'] = true;
+		$image_config['maintain_ratio'] = TRUE;
+		$image_config['thumb_marker'] = "_thumb";
+		$image_config['new_image'] = $upload_data["file_path"];
+		$image_config['quality'] = "100%";
+		$image_config['width'] = 320;
+		$image_config['height'] = 240;
+		$dim = (intval($upload_data["image_width"]) / intval($upload_data["image_height"])) - ($image_config['width'] / $image_config['height']);
+		$image_config['master_dim'] = ($dim > 0) ? "height" : "width";
 
-	//   $this->load->library('image_lib');
-	//   $this->image_lib->initialize($image_config);
+		$this->load->library('image_lib');
+		$this->image_lib->initialize($image_config);
 
-	//   if (!$this->image_lib->resize()) { //Resize image
-	//     redirect("errorhandler"); //If error, redirect to an error page
-	//   }
-	// }
+		if (!$this->image_lib->resize()) { //Resize image
+			redirect("errorhandler"); //If error, redirect to an error page
+		}
+	}
 }

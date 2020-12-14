@@ -116,6 +116,15 @@ class Pengajuan_model extends CI_Model
 		return $this->db->get()->result_array();
 	}
 
+	public function getPembimbing($search)
+	{
+		$this->db->select('*');
+		$this->db->from('V_Dosen');
+		$this->db->like('nama', $search);
+		$this->db->limit(10);
+		return $this->db->get()->result_array();
+	}
+
 	public function get_spesific_pengajuan_fields($pengajuan_id)
 	{
 		return $this->db->query(

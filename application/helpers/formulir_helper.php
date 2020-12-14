@@ -21,8 +21,9 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 
 	// print_r($fields);
 
-	if ($fields['type'] == 'image') {
+	if ($fields['type'] == 'image') { ?>
 
+		<?php
 		$image_id = (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];
 
 		$image = $CI->db->select('*')->from('Tr_Media')
@@ -34,7 +35,7 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 			$image = "base_url('public/dist/img/logo.png')";
 			$thumb = '';
 		}
-	?>
+		?>
 
 		<figure style="background:url('<?= $image; ?>') center center no-repeat" class="d-flex align-items-center justify-content-center upload-dokumen <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>">
 			<?php
@@ -95,8 +96,7 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 
 		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
-	<?php } elseif ($fields['type'] == 'ta') { //tahun akademik 
-	?>
+	<?php } elseif ($fields['type'] == 'ta') { ?>
 		<select class="form-control
 		<?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> 
 		<?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
@@ -112,8 +112,7 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 		</select>
 		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
-	<?php } elseif ($fields['type'] == 'sem') { //tahun akademik 
-	?>
+	<?php } elseif ($fields['type'] == 'sem') { ?>
 		<select class="form-control
 		<?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> 
 		<?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
@@ -128,22 +127,42 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
 		<!--  Piih Pembimbing -->
-	<?php } elseif ($fields['type'] == 'select_pembimbing') { //tahun akademik 
-	?>
-		<select class="form-control<?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> 
-		<?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?>>
-			<option value=""> -- Pilih Dosen -- </option>
-			<?php
-			$CI = &get_instance();
-			$CI->db->order_by('id_pegawai', 'DESC');
-			$dosen = $CI->db->get('V_Dosen')->result_array();
+	<?php } elseif ($fields['type'] == 'select_pembimbing') {	?>
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-			foreach ($dosen as $dosen) {
-			?>
-				<option value="<?= $dosen['id_pegawai'] ?>" <?= (validation_errors()) ? set_select('dokumen[' . $id . ']',  $dosen['id_pegawai']) : ""; ?><?= ($fields['value'] ==  $dosen['id_pegawai']) ? "selected" : ""; ?>><?= $dosen['nama'] ?></option>
-			<?php } ?>
-		</select>
+		<select type="text" class="js-data-example-ajax form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?>></select>
 		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+
+		<!-- <select class="js-data-example-ajax form-control form-control-lg" name="<?= $fields['key']; ?>"></select> -->
+
+		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+		<script>
+			$(document).ready(function() {
+				$('.js-data-example-ajax').select2({
+					ajax: {
+						url: '<?= base_url('mahasiswa/pengajuan/getpembimbing'); ?>',
+						dataType: 'json',
+						type: 'post',
+						delay: 250,
+						data: function(params) {
+							return {
+								search: params.term,
+							}
+						},
+						processResults: function(data) {
+							return {
+								results: data
+							};
+						},
+						cache: true
+					},
+					placeholder: 'Tuliskan Nama Dosen',
+					minimumInputLength: 3,
+					// templateResult: formatRepo,
+					// templateSelection: formatRepoSelection
+				});
+			});
+		</script>
 	<?php } elseif ($fields['type'] == 'number') { ?>
 		<div class="form-group">
 			<input type="number" class="form-control" name="<?= $fields['key']; ?>">
@@ -151,7 +170,7 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 	<?php } elseif ($fields['type'] == 'multi_select_anggota') { ?>
 		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-		<select class="js-data-example-ajax form-control form-control-lg" name="anggota[]" multiple></select>
+		<select class="js-data-example-ajax form-control form-control-lg" name="<?= $fields['key']; ?>[]" multiple></select>
 
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 		<script>
@@ -181,6 +200,49 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 				});
 			});
 		</script>
+	<?php } elseif ($fields['type'] == 'file') { ?>
+
+		<?php
+		$image_id = (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];
+
+		$image = $CI->db->select('*')->from('Tr_Media')
+			->where(array('id' => $image_id))->get()->row_array();
+		if ($image) {
+			$thumb = $image['thumb'];
+			$image = base_url($thumb);
+		} else {
+			$image = "base_url('public/dist/img/logo.png')";
+			$thumb = '';
+		}
+		?>
+
+		<figure style="background:url('<?= $image; ?>') center center no-repeat" class="d-flex align-items-center justify-content-center upload-dokumen <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>">
+			<?php
+			if ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) {
+				if ($thumb) { ?>
+					<button id="opener-<?= $id; ?>" class="opener hapus btn btn-danger btn-md" type="button"><i class="fas fa-trash"></i> Hapus</button>
+				<?php } else { ?>
+					<button id="opener-<?= $id; ?>" class="opener btn btn-info btn-md" type="button" data-toggle="modal" data-target="#fileUploader"><i class="fas fa-plus"></i> Upload</button>
+			<?php }  // $thumb
+			} // $pengajuan_status = 1
+			?>
+
+			<input type="hidden" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" class="dokumen" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" />
+		</figure>
+		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+	<?php } elseif ($fields['type'] == 'date') { ?>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+		<input type="text" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> />
+		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+
+		<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+		<script>
+			$(function() {
+				$("#input-<?= $id; ?>").datepicker();
+			});
+		</script>
 	<?php } ?>
 <?php } ?>
 
@@ -188,7 +250,7 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 {
 	$CI = &get_instance();
 	$CI->db->order_by('id', 'DESC');
-	$media = $CI->db->get_where('media', array('id_user' => $CI->session->userdata('user_id')))->result_array();
+	$media = $CI->db->get_where('Tr_Media', array('nim' => $CI->session->userdata('studentid')))->result_array();
 
 ?>
 
@@ -218,30 +280,24 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 									<div class="col-md-12 col-sm-12">
 										<div class="form-group mb-2">
 											<input type="hidden" class="value" value="" />
-
 											<input type="hidden" class="form-control" aria-describedby="fileHelp" placeholder="No image uploaded..." readonly="readonly">
-
 											<div class="progress mb-2 d-none">
 												<div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="0">
 													0%
 												</div>
 											</div>
-
 										</div>
+
 										<div class="form-group">
 											<div role="button" class="btn btn-primary">
 												<i class="fas fa-folder fa-fw"></i> Cari file atau seret ke sini
 												<input type="file" title="Klik untuk menambahkan file">
-
 											</div>
-
 										</div>
+
 									</div>
-
 								</div>
-
 							</form>
-
 						</div>
 						<div class="tab-pane fade" id="nav-galeri" role="tabpanel" aria-labelledby="nav-galeri-tab">
 							<small class="status text-muted"></small>
@@ -319,7 +375,7 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 		$(function() {
 
 			$('#drag-and-drop-zone').dmUploader({ //
-				url: '<?= base_url('mahasiswa/surat'); ?>/doupload/',
+				url: '<?= base_url('mahasiswa/pengajuan'); ?>/doupload/',
 				maxFileSize: 3000000, // 3 Megs max
 				multiple: false,
 				allowedTypes: 'image/*',
@@ -382,8 +438,10 @@ function generate_form_field($field_id, /*$pengajuan_id,*/ $pengajuan_status)
 					$('#files').prepend(template);
 
 					$('#nav-tab a[href="#nav-galeri"]').tab('show');
+					// alert('upload success');
 				},
 				onUploadError: function(id, xhr, status, message) {
+					// alert(message);
 					// Happens when an upload error happens
 					ui_single_update_active(this, false);
 					ui_single_update_status(this, 'Error: ' + message, 'danger');

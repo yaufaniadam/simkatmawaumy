@@ -85,4 +85,4 @@
 	<!-- /.col -->
 </div>
 
-<?php /*fileUploaderModal();*/ ?>
+<?php fileUploaderModal(); ?>

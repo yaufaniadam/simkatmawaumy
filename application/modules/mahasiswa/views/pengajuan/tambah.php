@@ -26,7 +26,7 @@
 							</label>
 
 							<div class="col-md-7">
-								<?php generate_form_field($pengajuan_field['field_id'], $pengajuan_status); ?>
+								<?php generate_form_field($pengajuan_field['field_id'], $pengajuan_id, $pengajuan_status); ?>
 							</div>
 						</div>
 
@@ -72,9 +72,7 @@
 							<li>
 								<span class="badge badge-<?= $tl['badge']; ?>"><?= $tl['status']; ?></span>
 								<span class="badge badge-secondary"><?= $tl['date']; ?></span>
-								<!-- <span class="badge badge-perak"> -->
-								<?/*= $tl['time']; */?>
-								<!-- </span> -->
+								<span class="badge badge-perak"><?= $tl['time']; ?></span>
 							</li>
 						<?php } ?>
 					</ul>

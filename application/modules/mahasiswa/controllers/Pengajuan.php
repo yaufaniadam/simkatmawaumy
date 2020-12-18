@@ -10,7 +10,6 @@ class Pengajuan extends Mahasiswa_Controller
 		$this->load->helper('formulir');
 	}
 
-
 	public function detail($id_surat = 0)
 	{
 		// $data['surat'] = $this->pengajuan_model->get_detail_surat($id_surat);
@@ -19,11 +18,46 @@ class Pengajuan extends Mahasiswa_Controller
 		// $this->load->view('layout/layout', $data);
 	}
 
+	public function pengajuan_saya()
+	{
+		$data['title'] = 'Pengajuan Saya';
+		$data['view'] = 'pengajuan/pengajuan_saya_ajax';
+		// $data['query'] = $this->db->query(
+		// 	"SELECT 
+		// 	p.*,
+		// 	jp.Jenis_Pengajuan,
+		// 	m.FULLNAME,
+		// 	m.NAME_OF_FACULTY,
+		// 	m.DEPARTMENT_ID,
+		// 	ps.pic,
+		// 	ps.status_id,
+		// 	ps.date,
+		// 	s.status,
+		// 	s.status_id,
+		// 	s.badge,
+		// 	FORMAT (ps.date, 'dd/MM/yyyy ') as date,
+		// 	FORMAT (ps.date, 'hh:mm:ss ') as time
+		// 	FROM Tr_Pengajuan p 
+		// 	LEFT JOIN Mstr_Jenis_Pengajuan jp ON p.Jenis_Pengajuan_Id = jp.Jenis_Pengajuan_Id
+		// 	LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+		// 	LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+		// 	LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
+		// 	WHERE p.nim = 20190140096
+		// 	AND ps.status_pengajuan_id = (SELECT MAX(status_pengajuan_id) 
+		// 											FROM Tr_Pengajuan_Status  
+		// 											WHERE pengajuan_id = p.pengajuan_id)"
+		// )->result_array();
+		$this->load->view('layout/layout', $data);
+	}
+
 	public function index($id_jenis_pengajuan = 0)
 	{
 		if ($id_jenis_pengajuan == 0) {
 			// $data['jenis_pengajuan'] = $this->pengajuan_model->get_jenis_pengajuan($id_jenis_pengajuan);
 			$data['rekognisi'] = $this->pengajuan_model->rekognisi();
+			$data['jenis_pengajuan'] = $this->db->query(
+				"SELECT * FROM Mstr_Jenis_Pengajuan WHERE parent IS NULL"
+			)->result_array();
 			$data['title'] = 'Ajukan Prestasi';
 			$data['all'] = true;
 			$data['view'] = 'pengajuan/index';
@@ -117,6 +151,31 @@ class Pengajuan extends Mahasiswa_Controller
 		}
 	}
 
+	public function getPengajuanSaya($id_jenis_pengajuan = 0)
+	{
+		// $search = $this->input->post('search');
+		$result_anggota = $this->pengajuan_model->getPengajuanSaya($id_jenis_pengajuan);
+
+		foreach ($result_anggota as $anggota) {
+			$selectajax[] = [
+				'pengajuan_id' => $anggota['pengajuan_id'],
+				'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
+				'nim' => $anggota['nim'],
+				'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],
+				'FULLNAME' => $anggota['FULLNAME'],
+				'NAME_OF_FACULTY' => $anggota['NAME_OF_FACULTY'],
+				'DEPARTMENT_ID' => $anggota['DEPARTMENT_ID'],
+				'pic' => $anggota['pic'],
+				'status_id' => $anggota['status_id'],
+				'date' => $anggota['date'],
+				'status' => $anggota['status'],
+				'badge' => $anggota['badge'],
+				'time' => $anggota['time'],
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
+		}
+	}
+
 	public function getPembimbing()
 	{
 		$search = $this->input->post('search');
@@ -148,7 +207,11 @@ class Pengajuan extends Mahasiswa_Controller
 		)->result_array();
 
 		$data['timeline'] = $this->db->query(
-			"SELECT * FROM Tr_Pengajuan_Status ps
+			"SELECT 
+			*,
+			FORMAT (ps.date, 'dd/MM/yyyy') as date,
+			FORMAT (ps.date, 'hh:mm:ss') as time 
+			FROM Tr_Pengajuan_Status ps
 			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
 			WHERE ps.pengajuan_id = $pengajuan->pengajuan_id"
 		)->result_array();
@@ -156,6 +219,7 @@ class Pengajuan extends Mahasiswa_Controller
 		// $data['pengajuan'] = $this->pengajuan_model->get_detail_pengajuan($pengajuan_id);
 		$data['pengajuan_fields'] = $pengajuan_fields;
 		$data['pengajuan_status'] = $pengajuan->status_id;
+		$data['pengajuan_id'] = $pengajuan->pengajuan_id;
 
 		if ($this->input->post("submit")) {
 			if ($this->input->post('revisi')) {
@@ -229,7 +293,7 @@ class Pengajuan extends Mahasiswa_Controller
 
 		$config = array(
 			'upload_path' => $upload_path,
-			'allowed_types' => "jpg|png",
+			'allowed_types' => "jpg|png|pdf|doc|docx",
 			'overwrite' => FALSE,
 		);
 
@@ -238,10 +302,12 @@ class Pengajuan extends Mahasiswa_Controller
 		if (!$this->upload->do_upload('file')) {
 			$error = array('error' => $this->upload->display_errors());
 
-			echo json_encode([
-				'status' => 'error',
-				'message' => $error
-			]);
+			echo json_encode(
+				[
+					'status' => 'error',
+					'message' => $error
+				]
+			);
 		} else {
 			$data = $this->upload->data();
 
@@ -256,13 +322,15 @@ class Pengajuan extends Mahasiswa_Controller
 				)
 			);
 
-			echo json_encode([
-				'status' => 'Ok',
-				'id' => $this->db->insert_id(),
-				// 'path' => $upload_path . '/' . $data['file_name']
-				'thumb' => $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'],
-				'orig' => $upload_path . '/' . $data['file_name']
-			]);
+			echo json_encode(
+				[
+					'status' => 'Ok',
+					'id' => $this->db->insert_id(),
+					// 'path' => $upload_path . '/' . $data['file_name'],
+					'thumb' => $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'],
+					'orig' => $upload_path . '/' . $data['file_name']
+				]
+			);
 		}
 	}
 

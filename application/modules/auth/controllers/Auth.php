@@ -106,7 +106,11 @@ class Auth extends CI_Controller
 					if ($ceknum == 0) {
 						// cek user ke tabel Mhs (SQLSERVER UMY)
 
-						$result = $this->db->query("SELECT * from dbo.V_Mahasiswa WHERE EMAIL ='$email' ")->row_array();
+						$result = $this->db->query(
+							"SELECT * from V_Mahasiswa m
+							LEFT JOIN Mstr_Department d on d.DEPARTMENT_ID = m.DEPARTMENT_ID
+							WHERE EMAIL ='$email' "
+						)->row_array();
 
 
 
@@ -114,8 +118,8 @@ class Auth extends CI_Controller
 							'studentid' => $result['STUDENTID'],
 							'fullname' => $result['FULLNAME'],
 							'email' => $result['EMAIL'],
-							'fakultas' => $result['name_of_faculty'],
-							'id_prodi' => $result['department_id'],
+							'fakultas' => $result['NAME_OF_FACULTY'],
+							'id_prodi' => $result['NAME_OF_DEPARTMENT'],
 							'role' => 3,
 							'created_at' => date('Y-m-d : h:m:s'),
 						);

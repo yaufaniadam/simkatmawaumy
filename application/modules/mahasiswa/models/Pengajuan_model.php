@@ -116,6 +116,38 @@ class Pengajuan_model extends CI_Model
 		return $this->db->get()->result_array();
 	}
 
+	function getPengajuanSaya($id_jenis_pengajuan = 0)
+	{
+		$nim = $_SESSION['studentid'];
+		return $this->db->query(
+			"SELECT 
+			p.*,
+			jp.Jenis_Pengajuan,
+			m.FULLNAME,
+			m.NAME_OF_FACULTY,
+			m.DEPARTMENT_ID,
+			ps.pic,
+			ps.status_id,
+			ps.date,
+			s.status,
+			s.status_id,
+			s.badge,
+			FORMAT (ps.date, 'hh:mm:ss ') as time
+			FROM Tr_Pengajuan p 
+			LEFT JOIN Mstr_Jenis_Pengajuan jp ON p.Jenis_Pengajuan_Id = jp.Jenis_Pengajuan_Id
+			LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+			LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
+			WHERE p.nim = $nim"
+				. ($id_jenis_pengajuan == 0 ? "" : "AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan") .
+				"AND ps.status_pengajuan_id = (SELECT MAX(status_pengajuan_id) 
+													FROM Tr_Pengajuan_Status  
+													WHERE pengajuan_id = p.pengajuan_id)"
+		)->result_array();
+
+		// return $this->db->query("SELECT * FROM V_Mahasiswa")->result_array();
+	}
+
 	public function getPembimbing($search)
 	{
 		$this->db->select('*');

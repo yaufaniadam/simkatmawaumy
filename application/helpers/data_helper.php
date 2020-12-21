@@ -3,6 +3,33 @@
 
 // print_r tool
 
+function get_jumlah_pengajuan_perbulan($nama_bulan)
+{
+	$CI = &get_instance();
+
+	return $CI->db->query(
+		"SELECT * FROM Tr_Pengajuan_Status ps
+		LEFT JOIN Tr_Pengajuan p ON p.pengajuan_id = ps.pengajuan_id
+		LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+		WHERE ps.status_id = 2 
+		AND m.DEPARTMENT_ID = '1'
+		AND FORMAT (ps.date, 'MMMM') = '$nama_bulan'
+		AND FORMAT (ps.date, 'yyyy') = YEAR(getdate())"
+	)->num_rows();
+}
+
+function get_jumlah_pengajuan_per_jenis_pengajuan($jenis_pengajuan_id)
+{
+	$CI = &get_instance();
+
+	return $CI->db->query(
+		"SELECT * FROM Tr_Pengajuan p 
+		LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+		-- WHERE m.DEPARTMENT_ID = '1'
+		WHERE p.Jenis_Pengajuan_Id = '$jenis_pengajuan_id'"
+	)->num_rows();
+}
+
 function printrs($var)
 {
 	echo "<pre>";

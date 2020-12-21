@@ -37,6 +37,22 @@ class Pengajuan_model extends CI_Model
 		return $result = $query->result_array();
 	}
 
+	public function pengajuan_perlu_diproses()
+	{
+		return $this->db->query("SELECT * FROM Tr_Pengajuan p 
+		LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+		WHERE ps.status_id != 1 
+		AND ps.status_id != 10")->num_rows();
+	}
+
+	public function pengajuan_selesai()
+	{
+		return $this->db->query("SELECT * FROM Tr_Pengajuan p 
+		LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+		WHERE ps.status_id != 1 
+		AND ps.status_id = 10")->num_rows();
+	}
+
 	public function get_arsip_pengajuan($DEPARTMENT_ID = 0)
 	{
 		$query = $this->db->query(
@@ -53,6 +69,29 @@ class Pengajuan_model extends CI_Model
 			WHERE ps.status_id = 10" . ($DEPARTMENT_ID == 0 ? "" : "AND d.DEPARTMENT_ID = $DEPARTMENT_ID")
 		);
 		return $query->result_array();
+	}
+
+	public function getbulan()
+	{
+		return $this->db->query(
+			"SELECT 
+			distinct(FORMAT (ps.date, 'MMMM')) AS bulan 
+			FROM Tr_Pengajuan_Status ps
+			WHERE ps.status_id = 2 
+			AND FORMAT (ps.date, 'yyyy') = YEAR(getdate())
+			ORDER BY bulan DESC
+			"
+		)->result_array();
+
+		// SELECT 
+		// distinct(FORMAT (ps.date, 'MMMM')) AS bulan 
+		// FROM Tr_Pengajuan_Status ps
+		// LEFT JOIN Tr_Pengajuan p ON p.pengajuan_id = ps.pengajuan_id
+		// LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+		// WHERE ps.status_id = 2 
+		// AND FORMAT (ps.date, 'yyyy') = YEAR(getdate())
+		// AND m.DEPARTMENT_ID = '1'
+		// ORDER BY bulan DESC
 	}
 
 	public function get_detail_pengajuan($pengajuan_id)

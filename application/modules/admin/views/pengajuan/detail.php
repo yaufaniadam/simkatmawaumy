@@ -129,10 +129,7 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 					<?= ($pengajuan['status_id'] == 1) ? '<a href="' . base_url('admin/pengajuan/proses_surat/' . $pengajuan['pengajuan_id']) . '" class="btn btn-warning btn-sm">Klik untuk Memproses</a>' : '' ?>
 
 					<input type="hidden" name="pengajuan_id" value="<?= $pengajuan['pengajuan_id']; ?>">
-					<!-- <input type="hidden" name="id_notif" value="<?/*= $pengajuan['id_notif']; */?>"> -->
-					<?php/* $ket_surat = explode(',', $pengajuan['kat_keterangan_surat']);*/ ?>
 
-					<!-- <input type="hidden" name="sizeof_ket_surat" value="<?/*= sizeof($ket_surat);*/ ?>"> -->
 					<input type="hidden" name="user_id" value="<?= $pengajuan['STUDENTID']; ?>">
 
 					<?php foreach ($fields as $field) {
@@ -194,16 +191,45 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 
 								<?php if ($pengajuan['status_id'] == 2) { ?>
 
+									// cek jumlah field dengan class .verifikasi
+									var numItems = $('.verifikasi').length;
 
-									// var check_all = sizeof = $("input[name='sizeof_ket_surat']").val();
+									// jika check radio id="diterima" diklik
+									$('#diterima').click(function(e) {
+										// lalu cocokkan dengan fungsi dibawah ini
+										// jumalh field yang dichecked harus sama dengan jumalh field
+										if ($('.verifikasi:checked').length != numItems) {
 
-									// $('#diterima').click(function(e) {
-									// 	if ($('.verifikasi:checked').length != check_all) {
+											//  jika jumlah field tidak sama, maka option id="#diterima" memunculkan modal eror di bawah
+											$('#error_modal').modal("show");
+											return false;
+										}
+									});
 
-									// 		$('#error_modal').modal("show");
-									// 		return false;
-									// 	}
-									// });
+									$('#ditolak').click(function(e) {
+										// lalu cocokkan dengan fungsi dibawah ini
+										// jumalh field yang dichecked harus sama dengan jumalh field
+										if ($('.verifikasi:checked').length == numItems) {
+
+											//  jika jumlah field tidak sama, maka option id="#diterima" memunculkan modal eror di bawah
+											//$('#error_modal').modal("show");
+											alert('sudah dicentang semua kok ditolak?');
+											return false;
+										}
+									});
+
+									$('#revisi').click(function(e) {
+										// lalu cocokkan dengan fungsi dibawah ini
+										// jumalh field yang dichecked harus sama dengan jumalh field
+										if ($('.verifikasi:checked').length == numItems) {
+
+											//  jika jumlah field tidak sama, maka option id="#diterima" memunculkan modal eror di bawah
+											//$('#error_modal').modal("show");
+											alert('sudah dicentang semua kok ditolak?');
+											return false;
+										}
+									});
+
 
 								<?php } ?>
 

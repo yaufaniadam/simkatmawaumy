@@ -139,7 +139,10 @@ class Pengajuan_model extends CI_Model
 			LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
 			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
 			WHERE p.nim = $nim"
-				. ($id_jenis_pengajuan == 0 ? "" : "AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan") .
+				. ($id_jenis_pengajuan == 0
+					? ""
+					: ($id_jenis_pengajuan == 12 ? "AND jp.parent = 12"
+						: " AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan")) .
 				"AND ps.status_pengajuan_id = (SELECT MAX(status_pengajuan_id) 
 													FROM Tr_Pengajuan_Status  
 													WHERE pengajuan_id = p.pengajuan_id)"
@@ -147,7 +150,7 @@ class Pengajuan_model extends CI_Model
 
 		// return $this->db->query("SELECT * FROM V_Mahasiswa")->result_array();
 	}
-
+	// AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan
 	public function getPembimbing($search)
 	{
 		$this->db->select('*');

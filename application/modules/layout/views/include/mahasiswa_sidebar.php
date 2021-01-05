@@ -26,7 +26,7 @@
 	</li>
 
 	<li class="nav-item" id="menu_surat">
-		<a class="nav-link" href="<?= base_url("/mahasiswa/pengajuan/pengajuan_saya/13"); ?>">
+		<a class="nav-link" href="<?= base_url("/mahasiswa/pengajuan/pengajuan_saya/12"); ?>">
 			<i class="fas fa-trophy"></i>
 			<span>Rekognisi</span>
 		</a>

@@ -17,6 +17,7 @@
 							<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/' . $department['DEPARTMENT_ID']); ?>"><?= $department['NAME_OF_DEPARTMENT']; ?></a>
 						<?php } ?>
 					</div>
+					<a class="btn btn-warning">Kategori Pengajuan</a>
 				</div>
 			</div>
 			<div class="card-body">

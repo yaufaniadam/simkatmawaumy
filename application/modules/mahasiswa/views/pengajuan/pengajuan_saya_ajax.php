@@ -3,6 +3,7 @@
 	// print_r($query);
 	$last = $this->uri->total_segments();
 	$record_num = $this->uri->segment($last);
+	echo get_meta_value('foto_usaha', 159, true)
 	?>
 </pre>
 
@@ -14,7 +15,7 @@
 				<table id="pengajuan-desc" class="display table table-striped table-bordered" style="width:100%">
 					<thead>
 						<tr>
-							<th>Jenis Pengajuan</th>
+							<th>Judul</th>
 							<th>Status</th>
 							<th>NIM</th>
 							<th>Terakhir Dilihat Admin</th>
@@ -60,7 +61,7 @@
 				"dataSrc": ""
 			},
 			columns: [{
-					data: 'Jenis_Pengajuan'
+					data: 'judul_karya'
 				},
 				{
 					data: 'status'

@@ -109,7 +109,7 @@ class Auth extends CI_Controller
 						$result = $this->db->query(
 							"SELECT * from V_Mahasiswa m
 							LEFT JOIN Mstr_Department d on d.DEPARTMENT_ID = m.DEPARTMENT_ID
-							WHERE EMAIL ='$email' "
+							WHERE email ='$email' "
 						)->row_array();
 
 
@@ -117,7 +117,7 @@ class Auth extends CI_Controller
 						$user_data = array(
 							'studentid' => $result['STUDENTID'],
 							'fullname' => $result['FULLNAME'],
-							'email' => $result['EMAIL'],
+							'email' => $result['email'],
 							'fakultas' => $result['NAME_OF_FACULTY'],
 							'id_prodi' => $result['NAME_OF_DEPARTMENT'],
 							'role' => 3,

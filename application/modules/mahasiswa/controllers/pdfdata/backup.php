@@ -157,42 +157,21 @@ class Pengajuan extends Mahasiswa_Controller
 		// $search = $this->input->post('search');
 		$result_anggota = $this->pengajuan_model->getPengajuanSaya($id_jenis_pengajuan);
 
-		if (count($result_anggota) > 0) {
-			foreach ($result_anggota as $anggota) {
-				$selectajax[] = [
-					'pengajuan_id' => $anggota['pengajuan_id'],
-					'judul_karya' => "<a href='" . base_url('mahasiswa/pengajuan/tambah/' . $anggota['pengajuan_id']) . "'>" . get_meta_value('karya', $anggota['pengajuan_id'], false) . "</a>",
-					'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
-					'nim' => $anggota['nim'],
-					'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],
-					'FULLNAME' => $anggota['FULLNAME'],
-					'NAME_OF_FACULTY' => $anggota['NAME_OF_FACULTY'],
-					'DEPARTMENT_ID' => $anggota['DEPARTMENT_ID'],
-					'pic' => $anggota['pic'],
-					'status_id' => $anggota['status_id'],
-					'date' => $anggota['date'],
-					'status' => $anggota['status'],
-					'badge' => $anggota['badge'],
-					'time' => $anggota['time'],
-				];
-				$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
-			}
-		} else {
+		foreach ($result_anggota as $anggota) {
 			$selectajax[] = [
-				'pengajuan_id' => "data kosong",
-				'judul_karya' => "data kosong",
-				'Jenis_Pengajuan_Id' => "data kosong",
-				'nim' => "data kosong",
-				'Jenis_Pengajuan' => "data kosong",
-				'FULLNAME' => "data kosong",
-				'NAME_OF_FACULTY' => "data kosong",
-				'DEPARTMENT_ID' => "data kosong",
-				'pic' => "data kosong",
-				'status_id' => "data kosong",
-				'date' => "data kosong",
-				'status' => "data kosong",
-				'badge' => "data kosong",
-				'time' => "data kosong",
+				'pengajuan_id' => $anggota['pengajuan_id'],
+				'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
+				'nim' => $anggota['nim'],
+				'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],
+				'FULLNAME' => $anggota['FULLNAME'],
+				'NAME_OF_FACULTY' => $anggota['NAME_OF_FACULTY'],
+				'DEPARTMENT_ID' => $anggota['DEPARTMENT_ID'],
+				'pic' => $anggota['pic'],
+				'status_id' => $anggota['status_id'],
+				'date' => $anggota['date'],
+				'status' => $anggota['status'],
+				'badge' => $anggota['badge'],
+				'time' => $anggota['time'],
 			];
 			$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
 		}
@@ -226,8 +205,7 @@ class Pengajuan extends Mahasiswa_Controller
 		$pengajuan_fields = $this->db->query(
 			"SELECT * FROM Tr_Pengajuan_Field pf
 			LEFT JOIN Mstr_Fields f ON f.field_id = pf.field_id
-			WHERE pf.Jenis_Pengajuan_Id = $pengajuan->Jenis_Pengajuan_Id
-			AND pf.terpakai = 1"
+			WHERE pf.Jenis_Pengajuan_Id = $pengajuan->Jenis_Pengajuan_Id"
 		)->result_array();
 
 		$data['timeline'] = $this->db->query(
@@ -246,7 +224,6 @@ class Pengajuan extends Mahasiswa_Controller
 		$data['pengajuan_id'] = $pengajuan->pengajuan_id;
 
 		if ($this->input->post("submit")) {
-
 			if ($this->input->post('revisi')) {
 				$id_status = 5;
 			} else {
@@ -261,49 +238,31 @@ class Pengajuan extends Mahasiswa_Controller
 				->insert('Tr_Pengajuan_Status');
 
 			if ($insert) {
-				// foreach ($this->input->post('dokumen') as $id => $dokumen) {
-				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-				// 	$this->db->update(
-				// 		'Tr_Field_Value',
-				// 		array(
-				// 			'value' => $dokumen
-				// 		)
-				// 	);
-				// }
-
-				// foreach ($this->input->post('dokumen') as $id => $dokumen) {
-				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-				// 	$this->db->update(
-				// 		'Tr_Field_Value',
-				// 		array(
-				// 			'value' => $dokumen
-				// 		)
-				// 	);
-				// }
-
 				foreach ($this->input->post('dokumen') as $id => $dokumen) {
-					if (is_array($dokumen)) {
-						$anggota = implode(",", $dokumen);
-						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-						$this->db->update(
-							'Tr_Field_Value',
-							array(
-								'value' => $anggota
-							)
-						);
-					} else {
-						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-						$this->db->update(
-							'Tr_Field_Value',
-							array(
-								'value' => $dokumen
-							)
-						);
-					}
+					$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+					$this->db->update(
+						'Tr_Field_Value',
+						array(
+							'value' => $dokumen
+						)
+					);
 				}
 
+				foreach ($this->input->post('dokumen') as $id => $dokumen) {
+					$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+					$this->db->update(
+						'Tr_Field_Value',
+						array(
+							'value' => $dokumen
+						)
+					);
+				}
 				redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 			}
+
+			// foreach ($this->input->post('dokumen') as $id => $dokumen) {
+			// 	echo $dokumen . "<br>";
+			// }
 		} else {
 			$data['view'] = 'pengajuan/tambah';
 			$this->load->view('layout/layout', $data);
@@ -356,16 +315,17 @@ class Pengajuan extends Mahasiswa_Controller
 				]
 			);
 		} else {
+
+			$filename = $config['file_name'] . $this->upload->data('file_ext');
+
 			$data = $this->upload->data();
 
-			$filename = $this->upload->data('file_ext');
-
-			// // cek apakah gambar atau bukan
+			// cek apakah gambar atau bukan
 
 			if (($filename === '.jpg') || ($filename === '.jpeg') || ($filename === '.png') || ($filename === '.gif')) {
 
-				// 	//$filename = 'gambar';
-				// 	// jka gambar, buatkan thumbnail
+				//$filename = 'gambar';
+				// jka gambar, buatkan thumbnail
 				$this->_create_thumbs($data['file_name']);
 
 				// $result = 
@@ -374,13 +334,9 @@ class Pengajuan extends Mahasiswa_Controller
 					array(
 						'nim' => $this->session->userdata('studentid'),
 						'file' =>  $upload_path . '/' . $data['file_name'],
-						//	'file' =>  $filename,
 						'thumb' =>  $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext']
-
 					)
 				);
-
-				$thumb = $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'];
 			} else {
 				// $result = 
 				$this->db->insert(
@@ -388,51 +344,24 @@ class Pengajuan extends Mahasiswa_Controller
 					array(
 						'nim' => $this->session->userdata('studentid'),
 						'file' =>  $upload_path . '/' . $data['file_name'],
-						'thumb' => 'public/dist/img/document.png'
+						'thumb' =>  ''
 					)
 				);
-
-
-				$thumb = 'public/dist/img/document.png';
 			}
+
+
 
 			echo json_encode(
 				[
 					'status' => 'Ok',
 					'id' => $this->db->insert_id(),
 					// 'path' => $upload_path . '/' . $data['file_name'],
-					'thumb' => $thumb,
+					'thumb' => $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'],
 					'orig' => $upload_path . '/' . $data['file_name'],
 					'filename' => $data['file_name']
 				]
 			);
-
-
-			// $this->_create_thumbs($data['file_name']);
-
-			// // $result = 
-			// $this->db->insert(
-			// 	'Tr_Media',
-			// 	array(
-			// 		'nim' => $this->session->userdata('studentid'),
-			// 		'file' =>  $upload_path . '/' . $data['file_name'],
-			// 		'thumb' =>  $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext']
-			// 	)
-			// );
-
-
 		}
-	}
-
-	public function get_used_file_name()
-	{
-		$used_file_id = $this->input->post('id');
-		$query = $this->db->query("SELECT * FROM Tr_Media WHERE id = $used_file_id")->row_array();
-		$file_dir = $query['file'];
-
-		$file_name = explode("/", $file_dir);
-
-		echo json_encode($file_name[2]);
 	}
 
 	// public function tampil_surat($id_surat)

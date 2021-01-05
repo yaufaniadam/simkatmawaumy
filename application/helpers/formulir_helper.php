@@ -962,8 +962,7 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
 				</label>
 			</div>
 			<div class="d-inline">
-				Data sudah sesuai? <a class="help" data-toggle
-				="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+				Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
 			</div>
 
 		<?php } ?>
@@ -1005,7 +1004,7 @@ function get_meta_value($key, $id_pengajuan, $file)
 {
 	$CI = &get_instance();
 
-	$value = $CI->db->select("mf.field_id, fv.value")
+	$value = $CI->db->select("*")
 		->from('Mstr_Fields mf')
 		->join('Tr_Field_Value fv', 'mf.field_id=fv.field_id', 'left')
 		->where(array("mf.key" => $key, 'fv.pengajuan_id' => $id_pengajuan))

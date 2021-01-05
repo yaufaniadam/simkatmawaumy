@@ -46,7 +46,7 @@ class Auth extends CI_Controller
 								'username' => $result['username'],
 								'fullname' => $result['fullname'],
 								'role' => $result['role'],
-								'id_prodi' => $result['id_prodi'],
+								// 'id_prodi' => $result['id_prodi'],
 								'is_login' => TRUE,
 							);
 

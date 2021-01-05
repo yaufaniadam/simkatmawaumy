@@ -161,7 +161,7 @@ class Pengajuan extends Mahasiswa_Controller
 			foreach ($result_anggota as $anggota) {
 				$selectajax[] = [
 					'pengajuan_id' => $anggota['pengajuan_id'],
-					'judul_karya' => "<a href='" . base_url('mahasiswa/pengajuan/tambah/' . $anggota['pengajuan_id']) . "'>" . get_meta_value('karya', $anggota['pengajuan_id'], false) . "</a>",
+					'judul_karya' => "<a href='" . base_url('mahasiswa/pengajuan/tambah/' . $anggota['pengajuan_id']) . "'>" . get_meta_value('judul', $anggota['pengajuan_id'], false) . "</a>",
 					'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
 					'nim' => $anggota['nim'],
 					'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],

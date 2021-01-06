@@ -3,7 +3,6 @@
 	// print_r($query);
 	$last = $this->uri->total_segments();
 	$record_num = $this->uri->segment($last);
-	echo get_meta_value('foto_usaha', 159, true)
 	?>
 </pre>
 

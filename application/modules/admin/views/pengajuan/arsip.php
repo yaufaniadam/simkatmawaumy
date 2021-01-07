@@ -1,23 +1,40 @@
-<!-- <pre>
-	<?php print_r($query) ?>
-</pre> -->
+<pre>
+	<?php
+	$last = $this->uri->total_segments();
+	$id_dprt = $this->uri->segment($last - 1);
+	$id_ktg = $this->uri->segment($last);
+	?>
+</pre>
 
 <div class="row">
 	<div class="col-12">
 
 		<div class="card card-success card-outline">
 			<div class="card-header">
-				<div class="dropdown">
-					<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						<?= $button_text; ?>
-					</button>
-					<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-						<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/'); ?>">Semua Prodi</a>
-						<?php foreach ($departments as $department) { ?>
-							<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/' . $department['DEPARTMENT_ID']); ?>"><?= $department['NAME_OF_DEPARTMENT']; ?></a>
-						<?php } ?>
+				<div class="row">
+					<div class="dropdown">
+						<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<?= $button_text; ?>
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+							<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/0/' . $id_ktg); ?>">Semua Prodi</a>
+							<?php foreach ($departments as $department) { ?>
+								<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/' . $department['DEPARTMENT_ID'] . '/' . $id_ktg); ?>"><?= $department['NAME_OF_DEPARTMENT']; ?></a>
+							<?php } ?>
+						</div>
 					</div>
-					<a class="btn btn-warning">Kategori Pengajuan</a>
+					<div class="ml-2"></div>
+					<div class="dropdown">
+						<button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButtons" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<?= $button_text_2; ?>
+						</button>
+						<div class="dropdown-menu" aria-labelledby="dropdownMenuButtons">
+							<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/' . $id_dprt . '/0'); ?>">Semua Kategori</a>
+							<?php foreach ($kategories as $kategori) { ?>
+								<a class="dropdown-item" href="<?= base_url('admin/pengajuan/arsip/' . $id_dprt . '/' . $kategori['Jenis_Pengajuan_Id']); ?>"><?= $kategori['Jenis_Pengajuan']; ?></a>
+							<?php } ?>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="card-body">

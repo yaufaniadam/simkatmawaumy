@@ -26,7 +26,7 @@
 	</li>
 
 	<li class="nav-item" id="semua_pengajuan">
-		<a class="nav-link" href="<?= base_url("admin/pengajuan/arsip/") ?>">
+		<a class="nav-link" href="<?= base_url("admin/pengajuan/arsip/0/0") ?>">
 			<i class="fas fa-file-archive"></i>
 			<span>Arsip Pengajuan</span>
 		</a>

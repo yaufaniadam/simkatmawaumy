@@ -107,12 +107,18 @@ class Jenispengajuan extends Admin_Controller
 
 				// $ssj = $this->input->post("kat_keterangan_surat[]");
 				// print_r($ssj['1']);
-				// print_r($this->pengajuan_model->editFieldsPengajuan($dataFieldCheck, $id));
+				// $vari = $this->pengajuan_model->editFieldsPengajuan($dataFieldCheck, $id);
+				// foreach ($vari as $vari) {
+				// 	echo "<br>";
+				// 	echo $vari['field_id'];
+				// }
+				// // echo "</pre>";
+
 
 				// echo "<br>";
 				// print_r(implode(',', $this->input->post("kat_keterangan_surat[]")));
 				// echo "<br>";
-				// print_r($dataFieldCheck['not_exist_fields_data']);
+				// print_r($dataFieldCheck['sent_fields_data']);
 			}
 		} else {
 			$data['kategori'] = $this->pengajuan_model->get_jenis_pengajuan_byid($id);

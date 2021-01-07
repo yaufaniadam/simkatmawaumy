@@ -17,18 +17,26 @@ class Pengajuan extends Admin_Controller
 		$this->load->view('layout/layout', $data);
 	}
 
-	public function arsip($DEPARTMENT_ID = 0)
+	public function arsip($DEPARTMENT_ID = 0, $ID_JENIS_PENGAJUAN = 0)
 	{
 		$department_data = $this->db->query("SELECT * FROM Mstr_Department")->result_array();
+		$kategori_data = $this->db->query("SELECT * FROM Mstr_Jenis_Pengajuan WHERE Jenis_Pengajuan_Id != 12")->result_array();
 
-		$data['query'] = $this->pengajuan_model->get_arsip_pengajuan();
+		$data['query'] = $this->pengajuan_model->get_arsip_pengajuan($DEPARTMENT_ID, $ID_JENIS_PENGAJUAN);
 		$data['departments'] = $department_data;
+		$data['kategories'] = $kategori_data;
 
 		$data['button_text'] = $DEPARTMENT_ID == 0 ? 'Semua Prodi' : $this->db->query(
 			"SELECT NAME_OF_DEPARTMENT 
 			FROM Mstr_Department 
 			WHERE DEPARTMENT_ID = $DEPARTMENT_ID"
 		)->row_object()->NAME_OF_DEPARTMENT;
+
+		$data['button_text_2'] = $ID_JENIS_PENGAJUAN == 0 ? 'Semua Kategori' : $this->db->query(
+			"SELECT Jenis_Pengajuan 
+			FROM Mstr_Jenis_Pengajuan 
+			WHERE Jenis_Pengajuan_Id = $ID_JENIS_PENGAJUAN"
+		)->row_object()->Jenis_Pengajuan;
 
 		$data['title'] = 'Semua Pengajuan';
 		$data['view'] = 'pengajuan/arsip';

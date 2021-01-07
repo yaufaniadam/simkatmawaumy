@@ -53,7 +53,7 @@ class Pengajuan_model extends CI_Model
 		AND ps.status_id = 10")->num_rows();
 	}
 
-	public function get_arsip_pengajuan($DEPARTMENT_ID = 0)
+	public function get_arsip_pengajuan($DEPARTMENT_ID = 0, $ID_JENIS_PENGAJUAN = 0)
 	{
 		$query = $this->db->query(
 			"SELECT 
@@ -65,8 +65,12 @@ class Pengajuan_model extends CI_Model
 			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
 			LEFT JOIN Mstr_Jenis_Pengajuan jp ON jp.Jenis_Pengajuan_Id = p.Jenis_Pengajuan_Id
 			LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
-			LEFT JOIN Mstr_Department d ON d.DEPARTMENT_ID = m.DEPARTMENT_ID
-			WHERE ps.status_id = 10" . ($DEPARTMENT_ID == 0 ? "" : "AND d.DEPARTMENT_ID = $DEPARTMENT_ID")
+			-- LEFT JOIN Mstr_Department d ON d.DEPARTMENT_ID = m.DEPARTMENT_ID
+			LEFT JOIN Mstr_Department d ON d.NAME_OF_DEPARTMENT = m.DEPARTMENT_ID
+			WHERE ps.status_id = 10"
+				// . ($DEPARTMENT_ID == 0 ? "" : "AND d.DEPARTMENT_ID = $DEPARTMENT_ID")
+				. ($DEPARTMENT_ID == 0 ? "" : "AND m.DEPARTMENT_ID = '$DEPARTMENT_ID'")
+				. ($ID_JENIS_PENGAJUAN == 0 ? "" : " AND jp.Jenis_Pengajuan_Id = $ID_JENIS_PENGAJUAN")
 		);
 		return $query->result_array();
 	}
@@ -177,29 +181,33 @@ class Pengajuan_model extends CI_Model
 			if ($datafield_exist == 0) {
 				$this->db->insert('Tr_Pengajuan_Field', $data);
 			}
-			//
+			//1,3,69,70,71,72,73
 
 
 			//mengecek field yang tidak digunakan
 			$id_field = $data['field_id'];
 
-			$fieldDB_not_exist_in_sentfield = $this->db->query(
+			$query_fields = $this->db->query(
 				"SELECT field_id FROM Tr_Pengajuan_Field 
 				WHERE Jenis_Pengajuan_Id = $id 
-				AND field_id = $field
+				-- AND field_id = $field
 				 AND field_id NOT IN ($not_exist_fields_data)"
-			)->num_rows();
+			);
+
+			$non_exist_fields = $query_fields->result_array();
 
 			$field_property = [
 				'terpakai' => 0
 			];
 
-			if ($fieldDB_not_exist_in_sentfield > 0) {
-				$this->db->update('Tr_Pengajuan_Field', $field_property, array('Jenis_Pengajuan_Id' => $id, 'field_id' => $id_field));
-			}
+			// if ($query_fields->num_rows() > 0) {
+			// 	foreach ($non_exist_fields as $field_tidak_diapakai) {
+			// 		$this->db->update('Tr_Pengajuan_Field', $field_property, array('Jenis_Pengajuan_Id' => $id, 'field_id' => $field_tidak_diapakai['field_id']));
+			// 	}
+			// }
 			//
 
-			// return $fieldDB_not_exist_in_sentfield;
+			// return $non_exist_fields;
 		}
 		// return $datafield_exist;
 	}

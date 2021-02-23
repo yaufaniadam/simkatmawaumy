@@ -146,7 +146,7 @@ class Pengajuan extends Mahasiswa_Controller
 			$selectajax[] = [
 				'value' => $anggota['STUDENTID'],
 				'id' => $anggota['STUDENTID'],
-				'text' => $anggota['FULLNAME']
+				'text' => $anggota['FULLNAME'] . " (" . $anggota['STUDENTID'] . ")"
 			];
 			$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
 		}
@@ -161,7 +161,15 @@ class Pengajuan extends Mahasiswa_Controller
 			foreach ($result_anggota as $anggota) {
 				$selectajax[] = [
 					'pengajuan_id' => $anggota['pengajuan_id'],
-					'judul_karya' => "<a href='" . base_url('mahasiswa/pengajuan/tambah/' . $anggota['pengajuan_id']) . "'>" . get_meta_value('judul', $anggota['pengajuan_id'], false) . "</a>",
+					'judul_karya' =>
+					"<a href='"
+						. base_url('mahasiswa/pengajuan/tambah/'
+							. $anggota['pengajuan_id'])
+						. "'>"
+						. get_meta_value('judul', $anggota['pengajuan_id'], false)
+						. "<br>"
+						. $anggota['Jenis_Pengajuan']
+						. "</a>",
 					'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
 					'nim' => $anggota['nim'],
 					'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],
@@ -215,6 +223,26 @@ class Pengajuan extends Mahasiswa_Controller
 
 	public function tambah($pengajuan_id = 0)
 	{
+		// foreach ($this->input->post('dokumen') as $id => $dokumen) {
+		// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+		// 	$this->db->update(
+		// 		'Tr_Field_Value',
+		// 		array(
+		// 			'value' => $dokumen
+		// 		)
+		// 	);
+		// }
+
+		// foreach ($this->input->post('dokumen') as $id => $dokumen) {
+		// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+		// 	$this->db->update(
+		// 		'Tr_Field_Value',
+		// 		array(
+		// 			'value' => $dokumen
+		// 		)
+		// 	);
+		// }
+
 		$id_notif = $this->input->post('id_notif');
 
 		$this->load->helper('formulir');
@@ -222,6 +250,8 @@ class Pengajuan extends Mahasiswa_Controller
 
 		$pengajuan = $this->pengajuan_model->get_detail_pengajuan($pengajuan_id);
 		$data['pengajuan'] = $pengajuan;
+
+
 
 		$pengajuan_fields = $this->db->query(
 			"SELECT * FROM Tr_Pengajuan_Field pf
@@ -244,8 +274,15 @@ class Pengajuan extends Mahasiswa_Controller
 		$data['pengajuan_fields'] = $pengajuan_fields;
 		$data['pengajuan_status'] = $pengajuan->status_id;
 		$data['pengajuan_id'] = $pengajuan->pengajuan_id;
+		$data['title'] =  $pengajuan->jenis_pengajuan;
 
 		if ($this->input->post("submit")) {
+
+			// foreach ($this->input->post('dokumen') as $id => $dokumen) {
+			// 	$this->form_validation->set_rules(
+			// 		'dokumen['.$id.']'
+			// 	);
+			// }
 
 			if ($this->input->post('revisi')) {
 				$id_status = 5;
@@ -254,6 +291,7 @@ class Pengajuan extends Mahasiswa_Controller
 			}
 
 			$data_user = $this->session->userdata('user_id');
+
 			$insert = $this->db->set('pengajuan_id', $pengajuan_id)
 				->set('status_id', $id_status)
 				->set('pic', $data_user['STUDENTID'])
@@ -261,26 +299,6 @@ class Pengajuan extends Mahasiswa_Controller
 				->insert('Tr_Pengajuan_Status');
 
 			if ($insert) {
-				// foreach ($this->input->post('dokumen') as $id => $dokumen) {
-				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-				// 	$this->db->update(
-				// 		'Tr_Field_Value',
-				// 		array(
-				// 			'value' => $dokumen
-				// 		)
-				// 	);
-				// }
-
-				// foreach ($this->input->post('dokumen') as $id => $dokumen) {
-				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-				// 	$this->db->update(
-				// 		'Tr_Field_Value',
-				// 		array(
-				// 			'value' => $dokumen
-				// 		)
-				// 	);
-				// }
-
 				foreach ($this->input->post('dokumen') as $id => $dokumen) {
 					if (is_array($dokumen)) {
 						$anggota = implode(",", $dokumen);
@@ -309,6 +327,7 @@ class Pengajuan extends Mahasiswa_Controller
 			$this->load->view('layout/layout', $data);
 		}
 	}
+
 	// public function edit()
 	// {
 	//   $data['query'] = $this->pengajuan_model->get_surat();

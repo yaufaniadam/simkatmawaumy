@@ -132,16 +132,13 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 
 					<input type="hidden" name="user_id" value="<?= $pengajuan['STUDENTID']; ?>">
 
-					<?php foreach ($fields as $field) {
-						/*$type = kat_keterangan_surat($value)['type'];
-						$kat_keterangan_surat = kat_keterangan_surat($value)['kat_keterangan_surat']; */ ?>
+					<?php foreach ($fields as $field) { ?>
 
 						<div class="form-row">
 							<label class="col-md-5" for="dokumen[<?= $field['field_id'] ?>]">
 								<?= $field['field'] ?></label>
 							<div class="col-md-7">
 								<?php
-								// memanggil form (data_helper.php)
 								generate_keterangan_surat($field['field_id'], $pengajuan['pengajuan_id'], $pengajuan['status_id']);
 								?>
 							</div>

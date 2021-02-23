@@ -1,6 +1,4 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
-
-
 // print_r tool
 
 function get_jumlah_pengajuan_perbulan($nama_bulan)
@@ -12,7 +10,7 @@ function get_jumlah_pengajuan_perbulan($nama_bulan)
 		LEFT JOIN Tr_Pengajuan p ON p.pengajuan_id = ps.pengajuan_id
 		LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
 		WHERE ps.status_id = 2 
-		AND m.DEPARTMENT_ID = '1'
+		-- AND m.DEPARTMENT_ID = '1'
 		AND FORMAT (ps.date, 'MMMM') = '$nama_bulan'
 		AND FORMAT (ps.date, 'yyyy') = YEAR(getdate())"
 	)->num_rows();

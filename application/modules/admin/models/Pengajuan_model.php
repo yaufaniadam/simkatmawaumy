@@ -146,7 +146,7 @@ class Pengajuan_model extends CI_Model
 		$query1 = $this->db->query("SELECT * FROM dbo.Mstr_Jenis_Pengajuan where Jenis_Pengajuan_Id='$id'");
 		$result1 = $query1->row_array();
 
-		$query2 = $this->db->query("SELECT field_id FROM Tr_Pengajuan_Field where Jenis_Pengajuan_Id=$id");
+		$query2 = $this->db->query("SELECT field_id FROM Tr_Pengajuan_Field where Jenis_Pengajuan_Id=$id AND terpakai = 1");
 		$result2 = $query2->result_array();
 
 		return array($result1, $result2);
@@ -160,16 +160,15 @@ class Pengajuan_model extends CI_Model
 	public function editFieldsPengajuan($dataFieldCheck, $id)
 	{
 		$not_exist_fields_data = $dataFieldCheck['not_exist_fields_data'];
-		$sent_feilds_data = $dataFieldCheck['sent_fields_data'];
+		$sent_fields_data = $dataFieldCheck['sent_fields_data'];
 
-		foreach ($sent_feilds_data as $field) {
+		foreach ($sent_fields_data as $field) {
 
 			$data = [
 				'Jenis_Pengajuan_Id' => $id,
 				'field_id' => $field,
 				'terpakai' => 1
 			];
-
 
 			// menambahkan field yang belum ada
 			$datafield_exist = $this->db->query(
@@ -178,37 +177,56 @@ class Pengajuan_model extends CI_Model
 										SELECT field_id FROM Tr_Pengajuan_Field 
 										WHERE Jenis_Pengajuan_Id = $id AND field_id = " . $data['field_id'] . " )"
 			)->num_rows();
+
 			if ($datafield_exist == 0) {
 				$this->db->insert('Tr_Pengajuan_Field', $data);
+			} else {
+				$field_property = [
+					'terpakai' => 1
+				];
+
+				$this->db->update(
+					'Tr_Pengajuan_Field',
+					$field_property,
+					[
+						'Jenis_Pengajuan_Id' => $id,
+						'field_id' => $data['field_id']
+					]
+				);
 			}
 			//1,3,69,70,71,72,73
 
-
 			//mengecek field yang tidak digunakan
-			$id_field = $data['field_id'];
-
-			$query_fields = $this->db->query(
-				"SELECT field_id FROM Tr_Pengajuan_Field 
-				WHERE Jenis_Pengajuan_Id = $id 
-				-- AND field_id = $field
-				 AND field_id NOT IN ($not_exist_fields_data)"
-			);
-
-			$non_exist_fields = $query_fields->result_array();
-
-			$field_property = [
-				'terpakai' => 0
-			];
-
-			// if ($query_fields->num_rows() > 0) {
-			// 	foreach ($non_exist_fields as $field_tidak_diapakai) {
-			// 		$this->db->update('Tr_Pengajuan_Field', $field_property, array('Jenis_Pengajuan_Id' => $id, 'field_id' => $field_tidak_diapakai['field_id']));
-			// 	}
-			// }
-			//
-
-			// return $non_exist_fields;
+			// $id_field = $data['field_id'];
 		}
+
+		$query_fields = $this->db->query(
+			"SELECT field_id FROM Tr_Pengajuan_Field 
+			WHERE Jenis_Pengajuan_Id = $id 
+			-- AND field_id = $field
+			 AND field_id NOT IN ($not_exist_fields_data)"
+		);
+
+		$non_exist_fields = $query_fields->result_array();
+
+		$field_property = [
+			'terpakai' => 0
+		];
+
+		if ($query_fields->num_rows() > 0) {
+			foreach ($non_exist_fields as $field_tidak_dipakai) {
+				$this->db->update(
+					'Tr_Pengajuan_Field',
+					$field_property,
+					[
+						'Jenis_Pengajuan_Id' => $id,
+						'field_id' => $field_tidak_dipakai['field_id']
+					]
+				);
+			}
+		}
+
+		// return $non_exist_fields;
 		// return $datafield_exist;
 	}
 

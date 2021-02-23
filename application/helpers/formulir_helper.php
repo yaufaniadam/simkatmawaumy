@@ -176,7 +176,6 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status)
 			<input type="number" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> />
 		</div>
 	<?php } elseif ($fields['type'] == 'multi_select_anggota') { ?>
-
 		<?php
 		$CI = &get_instance();
 		$query = $CI->db->query("SELECT value FROM Tr_Field_Value WHERE pengajuan_id = $pengajuan_id AND field_id = $id")->row_array();
@@ -278,9 +277,9 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status)
 				// $thumb
 			} else { ?>
 				<div class="col-12 text-center">
-					<a class="btn btn-success btn-md" href="<?= base_url($thumb); ?>">Download</a>
+					<a class="btn <?= isset($file_name) ? '' : 'disabled'; ?> btn-success btn-md" href="<?= base_url($thumb); ?>">Download</a>
 					<br>
-					<span id="nama-file" class="file-opener-<?= $id; ?>"><?= $file_name; ?></span>
+					<span id="nama-file" class="file-opener-<?= $id; ?>"><?= isset($file_name) ? $file_name : ''; ?></span>
 				</div>
 			<?php } ?>
 
@@ -759,12 +758,13 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
 
 		<?php }
 	} elseif ($fields['type'] == 'select_pembimbing') {
-
 		$CI = &get_instance();
-		$dosen = $CI->db->get_where('users', array('id' => $fields['value']))->row_array();
+		$dosen = $CI->db->get_where('V_Dosen', array('id_pegawai' => $fields['value']))->row_array();
+		// print_r($dosen);
+
 		?>
 
-		<input type="text" class="form-control mb-2" id="input-<?= $id; ?>" disabled value="<?= $dosen['fullname'];  ?>"></input>
+		<input type="text" class="form-control mb-2" id="input-<?= $id; ?>" disabled value="<?= $dosen['nama'];  ?>"></input>
 
 		<?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
 			&& $CI->session->userdata('role') == 2
@@ -886,9 +886,9 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
 				// $thumb
 			} else { ?>
 				<div class="col-12 text-center">
-					<a class="btn btn-success btn-md" href="<?= base_url($thumb); ?>">Download</a>
+					<a class="btn btn-success <?= isset($file_name) ? '' : 'disabled'; ?> btn-md" href="<?= base_url($thumb); ?>">Download</a>
 					<br>
-					<span id="nama-file" class="file-opener-<?= $id; ?>"><?= $file_name; ?></span>
+					<span id="nama-file" class="file-opener-<?= $id; ?>"><?= isset($file_name) ? $file_name : ''; ?></span>
 				</div>
 			<?php } ?>
 

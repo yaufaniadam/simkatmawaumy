@@ -72,6 +72,7 @@
 	</div>
 	<div class="row">
 		<!-- Area Chart -->
+
 		<div class="col-xl-8 col-lg-7">
 			<div class="card shadow mb-4">
 				<!-- Card Header - Dropdown -->
@@ -82,11 +83,9 @@
 							<i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
 						</a>
 						<div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
-							<div class="dropdown-header">Menu:</div>
+							<div class="dropdown-header">Menu :</div>
 							<a class="dropdown-item" href="#">Pertahun</a>
 							<a class="dropdown-item" href="#">Perbulan</a>
-							<!-- <div class="dropdown-divider"></div>
-						<a class="dropdown-item" href="#">Something else here</a> -->
 						</div>
 					</div>
 				</div>
@@ -140,8 +139,6 @@
 						<canvas id="myPieChart" width="301" height="245" class="chartjs-render-monitor" style="display: block; width: 301px; height: 245px;"></canvas>
 					</div>
 					<div class="mt-4 text-center small">
-
-
 					</div>
 				</div>
 			</div>

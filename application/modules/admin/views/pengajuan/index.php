@@ -16,7 +16,7 @@
 						<thead>
 							<tr>
 								<th style="width:50%">Perihal</th>
-								<th style="width:20%">Jenis Pengajuan</th>
+								<th style="width:20%">Status</th>
 								<th>Mahasiswa</th>
 								<th>Tanggal</th>
 							</tr>
@@ -102,18 +102,28 @@
 
 <script>
 	$(document).ready(function() {
-		$('#pengajuan').DataTable({
-
-			<?php if ($this->session->userdata('role') == 1) { ?> "order": [
-					[1, "asc"]
-				]
-			<?php } ?>
-			<?php if ($this->session->userdata('role') == 5) { ?> "order": [
-					[1, "desc"]
-				]
-			<?php } ?>
-
-
+		$('#pengajuan-desc').DataTable({
+			// 	"processing": true,
+			// 	"serverSide": true,
+			// 	"order": [],
+			// 	"ajax": {
+			// 		"url": "<?= base_url('admin/pengajuan/getDataPengajuan'); ?>",
+			// 		"type": "POST"
+			// 	},
+			// 	"columnDefs": [{
+			// 		"target": [-1],
+			// 		"orderable": false
+			// 	}]
+			<?php /*if ($this->session->userdata('role') == 1) {*/ ?>
+			// "order": [
+			// 	[1, "asc"]
+			// ]
+			<?php /*}*/ ?>
+			<?php /*if ($this->session->userdata('role') == 5) { */ ?>
+			// "order": [
+			// 	[1, "desc"]
+			// ]
+			<?php /*}*/ ?>
 		});
 	});
 </script>

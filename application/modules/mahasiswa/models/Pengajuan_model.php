@@ -96,10 +96,12 @@ class Pengajuan_model extends CI_Model
 	public function get_detail_pengajuan($pengajuan_id)
 	{
 		return $this->db->query(
-			"SELECT * FROM Tr_Pengajuan p
+			"SELECT *, jp.jenis_pengajuan FROM Tr_Pengajuan p
 			LEFT JOIN Mstr_Jenis_Pengajuan jp ON jp.Jenis_Pengajuan_Id = p.Jenis_Pengajuan_Id 		
 			LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
 			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
+			LEFT JOIN V_Mahasiswa m ON p.nim = m.STUDENTID
+			LEFT JOIN Mstr_Department d ON d.DEPARTMENT_ID = m.DEPARTMENT_ID
 			WHERE p.pengajuan_id = $pengajuan_id AND s.status_id = (SELECT status_id FROM Tr_Pengajuan_Status WHERE status_pengajuan_id = (
 			SELECT MAX(status_pengajuan_id) FROM Tr_Pengajuan_Status WHERE pengajuan_id = $pengajuan_id
 			))"

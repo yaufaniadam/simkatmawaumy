@@ -27,7 +27,8 @@
 										<div id="collapse-1-<?= $rekognisi['Jenis_Pengajuan_Id']; ?>" class="collapse" data-parent="#accordion-1" aria-labelledby="heading-1-2">
 											<div class="card-body">
 												<?= $rekognisi['deskripsi']; ?>
-												<a class="btn btn-md" href="<?= base_url('mahasiswa/pengajuan/baru/' . $rekognisi['Jenis_Pengajuan_Id']); ?>">Ajukan Surat</a> </div>
+												<a class="btn btn-md" href="<?= base_url('mahasiswa/pengajuan/baru/' . $rekognisi['Jenis_Pengajuan_Id']); ?>">Ajukan Surat</a>
+											</div>
 										</div>
 									</div>
 								<?php } ?>
@@ -57,6 +58,5 @@
 
 			</div>
 		</div>
-
 	</div>
 </div>

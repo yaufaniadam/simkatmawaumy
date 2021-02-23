@@ -6,6 +6,7 @@ class Pengajuan extends Admin_Controller
 	{
 		parent::__construct();
 		$this->load->model('pengajuan_model', 'pengajuan_model');
+		$this->load->model('data_pengajuan_model', 'data_pengajuan_model');
 		$this->load->model('notif/Notif_model', 'notif_model');
 	}
 
@@ -71,6 +72,10 @@ class Pengajuan extends Admin_Controller
 
 		$data['title'] = 'Detail Pengajuan';
 		$data['view'] = 'pengajuan/detail';
+
+		// echo "<pre>";
+		// print_r($data);
+		// echo "</pre>";
 
 		$this->load->view('layout/layout', $data);
 	}
@@ -375,7 +380,6 @@ class Pengajuan extends Admin_Controller
 		echo json_encode($data);
 	}
 
-
 	public function ajukan($id_kategori = 0)
 	{
 		$data['kategori_pengajuan'] = $this->pengajuan_model->get_kategori_pengajuan('p');
@@ -543,5 +547,12 @@ class Pengajuan extends Admin_Controller
 
 			$this->load->view('layout/layout', $data);
 		}
+	}
+
+	public function getDataPengajuan()
+	{
+		$result = $this->data_pengajuan_model->getDataPengajuan();
+
+		print_r($result);
 	}
 }

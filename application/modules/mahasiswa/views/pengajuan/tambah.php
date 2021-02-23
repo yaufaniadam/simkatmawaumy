@@ -2,6 +2,41 @@
 
 <div class="row">
 	<div class="col-md-8 mb-4">
+		<?php if ($pengajuan->status_id == 7) { ?>
+
+			<div class="card shadow mb-3">
+				<a href="#collPengantar" class="d-block card-header pt-3 pb-2 bg-tosca" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collPengantar">
+					<p class="h6 font-weight-bold text-white">Pengantar</p>
+				</a>
+				<div class="collapse show" id="collPengantar">
+					<div class="card-body">
+						<!-- <p class="font-italic">Assalamu'alaikum warahmatullahi wabarakatuh</p> -->
+						<p> Pengajuan anda sudah diterima </p>
+						<p> Silahkan menunggu petunjuk selanjutnya untuk mencairkan dana </p>
+
+						<table class="mb-3 ml-3 table-striped" style="width:95%">
+							<tr>
+								<td style="width:150px;">Nama</td>
+								<td> : <?= $pengajuan->FULLNAME; ?></td>
+							</tr>
+							<tr>
+								<td>NIM</td>
+								<td> : <?= $pengajuan->nim; ?></td>
+							</tr>
+							<tr>
+								<td>Program Studi</td>
+								<td> : <?= $pengajuan->NAME_OF_DEPARTMENT; ?></td>
+							</tr>
+							<tr>
+								<td>Jenis Surat</td>
+								<td> : <?= $pengajuan->Jenis_Pengajuan; ?></td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		<?php } ?>
 		<div class="card shadow">
 			<a href="#collKeterangan" class="d-block card-header pt-3 pb-2 bg-abumuda <?= ($pengajuan->status_id == 10) ? "collapsed" : "" ?>" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collKeterangan">
 				<p class="h6 font-weight-bold text-white">Keterangan</p>
@@ -58,6 +93,19 @@
 				</div>
 			</div>
 		<?php  } ?>
+		<?php if ($pengajuan->status_id == 7) { ?>
+			<div class="card shadow mt-3">
+				<a href="#collterbit" class="d-block card-header pt-3 pb-2 bg-success" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collterbit">
+					<p class="h6 font-weight-bold text-white">Surat</p>
+				</a>
+				<div class="collapse show" id="collterbit">
+					<div class="card-body pb-3">
+						Download Surat Untuk Mencairkan Dana
+						<a href="<?= base_url("admin/pengajuan/tampil_surat/" . $pengajuan->pengajuan_id); ?>" class="btn btn-success"> <i class="fas fa-file-pdf"></i> PDF</a>
+					</div>
+				</div>
+			</div>
+		<?php } ?>
 	</div>
 	<div class="col-md-4">
 

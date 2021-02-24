@@ -454,44 +454,51 @@ class Pengajuan extends Mahasiswa_Controller
 		echo json_encode($file_name[2]);
 	}
 
-	// public function tampil_surat($id_surat)
-	// {
-	//   $data['title'] = 'Tampil Surat';
-	//   $data['surat'] = $this->pengajuan_model->get_detail_surat($id_surat);
-	//   $data['no_surat'] = $this->pengajuan_model->get_no_surat($id_surat);
-	//   $kategori = $data['surat']['kategori_surat'];
-	//   $nim = $data['surat']['username'];
+	public function tampil_pengajuan($id_surat)
+	{
 
-	//   //$this->load->view('admin/surat/tampil_surat', $data);
+		$data['title'] = 'Tampil Surat';
+		$data['pengajuan'] = $this->pengajuan_model->get_detail_pengajuan($id_surat);
 
-	//   $mpdf = new \Mpdf\Mpdf([
-	//     'tempDir' => __DIR__ . '/pdfdata',
-	//     'mode' => 'utf-8',
-	//     // 'format' => [24, 24],
-	//     'format' => 'A4',
-	//     'margin_left' => 0,
-	//     'margin_right' => 0,
-	//     'margin_bottom' => 20,
-	//     'margin_top' => 30,
-	//     'float' => 'left'
-	//   ]);
+		echo '<pre>';
+		print_r($data['pengajuan']);
+		echo '</pre>';
 
-	//   $view = $this->load->view('admin/surat/tampil_surat', $data, TRUE);
+		// $data['no_surat'] = $this->pengajuan_model->get_no_surat($id_surat);
+		// $kategori = $data['surat']['kategori_surat'];
+		// $nim = $data['surat']['username'];
 
-	//   $mpdf->SetHTMLHeader('
-	// 	<div style="text-align: left; margin-left:2cm">
-	// 			<img width="390" height="" src="' . base_url() . '/public/dist/img/logokop-pasca.jpg" />
-	// 	</div>');
-	//   $mpdf->SetHTMLFooter('
+		//$this->load->view('admin/surat/tampil_surat', $data);
 
-	// 	<div style="text-align:center; background:red;">
-	// 		<img width="" height="" src="' . base_url() . '/public/dist/img/footerkop-pasca.jpg" />
-	// 	</div>');
+		// $mpdf = new \Mpdf\Mpdf([
+		// 	'tempDir' => __DIR__ . '/pdfdata',
+		// 	'mode' => 'utf-8',
+		// 	// 'format' => [24, 24],
+		// 	'format' => 'A4',
+		// 	'margin_left' => 0,
+		// 	'margin_right' => 0,
+		// 	'margin_bottom' => 20,
+		// 	'margin_top' => 30,
+		// 	'float' => 'left'
+		// ]);
 
-	//   $mpdf->WriteHTML($view);
+		// $view = $this->load->view('mahasiswa/pengajuan/tampil_pengajuan', $data, TRUE);
 
-	//   $mpdf->Output('Surat-' . $kategori . '-' . $nim . '.pdf', 'D');
-	// }
+		// $mpdf->SetHTMLHeader('
+		// <div style="text-align: left; margin-left:2cm">
+		// 		<img width="390" height="" src="' . base_url() . '/public/dist/img/logokop-lpka.jpg" />
+		// </div>');
+		// $mpdf->SetHTMLFooter('
+
+		// <div style="text-align:center; background:red;">
+		// 	<img width="" height="" src="' . base_url() . '/public/dist/img/footerkop-lpka.jpg" />
+		// </div>');
+
+		// $mpdf->WriteHTML($view);
+
+		// //		$mpdf->Output('Surat-' . $kategori . '-' . $nim . '.pdf', 'D');
+		// $mpdf->Output('Surat-.pdf', 'D');
+	}
 
 	function _create_thumbs($upload_data)
 	{

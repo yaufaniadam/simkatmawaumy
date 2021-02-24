@@ -75,9 +75,9 @@ $query_builder = TRUE;
 
 $db['dbsqlsrv'] = array(
 	'dsn'	=> '',
-	'hostname' => 'ADAM-DELL-6430U\SQLEXPRESS',
-	'username' => 'toor',
-	'password' => 'root',
+	'hostname' => '10.0.1.65\DEV',
+	'username' => 'programmer',
+	'password' => 'programmer',
 	'database' => 'simkatmawa',
 	'dbdriver' => 'sqlsrv',
 	'dbprefix' => '',

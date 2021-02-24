@@ -140,10 +140,10 @@ class Pengajuan_model extends CI_Model
 			LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
 			LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
 			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
-			WHERE p.nim = $nim"
+			WHERE p.nim = '$nim' "
 				. ($id_jenis_pengajuan == 0
 					? ""
-					: ($id_jenis_pengajuan == 12 ? "AND jp.parent = 12"
+					: ($id_jenis_pengajuan == 12 ? "AND jp.parent = 12 "
 						: " AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan")) .
 				"AND ps.status_pengajuan_id = (SELECT MAX(status_pengajuan_id) 
 													FROM Tr_Pengajuan_Status  

@@ -172,9 +172,8 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status)
 			});
 		</script>
 	<?php } elseif ($fields['type'] == 'number') { ?>
-		<div class="form-group">
-			<input type="number" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> />
-		</div>
+		<input type="number" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> />
+		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 	<?php } elseif ($fields['type'] == 'multi_select_anggota') { ?>
 		<?php
 		$CI = &get_instance();
@@ -197,6 +196,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status)
 			}
 			?>
 		</select>
+		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 		<script>
@@ -760,7 +760,7 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
 	} elseif ($fields['type'] == 'select_pembimbing') {
 		$CI = &get_instance();
 		$dosen = $CI->db->get_where('V_Dosen', array('id_pegawai' => $fields['value']))->row_array();
-		// print_r($dosen);
+		print_r($dosen);
 
 		?>
 

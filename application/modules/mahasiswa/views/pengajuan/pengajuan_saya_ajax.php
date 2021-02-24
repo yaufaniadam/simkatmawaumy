@@ -36,7 +36,7 @@
 
 <script>
 	$(document).ready(function() {
-		console.log('asdf');
+		// console.log('asdf');
 		// $('#pengajuan-desc').DataTable({
 		// 	responsive: true,
 		// 	// "destroy": true,

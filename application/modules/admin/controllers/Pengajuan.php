@@ -5,6 +5,7 @@ class Pengajuan extends Admin_Controller
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->model('periode_model', 'periode_model');
 		$this->load->model('pengajuan_model', 'pengajuan_model');
 		$this->load->model('data_pengajuan_model', 'data_pengajuan_model');
 		$this->load->model('notif/Notif_model', 'notif_model');
@@ -16,6 +17,32 @@ class Pengajuan extends Admin_Controller
 		$data['title'] = 'Semua Pengajuan';
 		$data['view'] = 'pengajuan/index';
 		$this->load->view('layout/layout', $data);
+	}
+
+	public function verified()
+	{
+		if ($this->input->post('submit')) {
+
+			$daftar_pengajuan_id = $this->input->post('pengajuan_id[]');
+			$periode_id = $this->input->post('periode_id');
+
+			foreach ($daftar_pengajuan_id as $pengajuan_id) {
+				$jenis_pengajuan_id = $this->db->get_where('Tr_Pengajuan', ['pengajuan_id' => $pengajuan_id])->row_object()->Jenis_Pengajuan_Id;
+				$is_field_anggota_exist = $this->db->get_where('Tr_Pengajuan_Field', ['Jenis_Pengajuan_Id' => $jenis_pengajuan_id, 'field_id' => 77])->num_rows();
+				if ($is_field_anggota_exist > 0) {
+					$result = $this->db->get_where('Tr_Field_Value', ['pengajuan_id' => $pengajuan_id, 'field_id' => 77])->row_object()->value;
+					$anggota = explode(',', $result);
+				}
+			}
+
+			print_r($anggota);
+		} else {
+			$data['query'] = $this->pengajuan_model->getVerifiedPengajuan();
+			$data['title'] = 'Pengajuan yang telah diverifikasi';
+			$data['view'] = 'pengajuan/index';
+			$data['daftar_periode'] = $this->periode_model->getPeriode('');
+			$this->load->view('layout/layout', $data);
+		}
 	}
 
 	public function arsip($DEPARTMENT_ID = 0, $ID_JENIS_PENGAJUAN = 0)
@@ -549,10 +576,63 @@ class Pengajuan extends Admin_Controller
 		}
 	}
 
+	public function datatable_json()
+	{
+		$records = $this->user_model->get_all_users();
+		$data = array();
+		foreach ($records['data']  as $row) {
+			// $status = ($row['is_active'] == 0) ? 'Deactive' : 'Active' . '<span>';
+			// $disabled = ($row['is_admin'] == 1) ? 'disabled' : '' . '<span>';
+			$data[] = array(
+				$row['username'],
+				$row['email'],
+				$row['mobile_no'],
+				'<span class="btn btn-info btn-flat btn-xs" title="status">' . getGroupyName($row['role']) . '<span>',	// get Group name by ID (getGroupyName() is a helper function)
+				'<span class="btn btn-success btn-flat btn-xs" title="status">' . $status . '<span>',
+				'<a title="Delete" class="delete btn btn-sm btn-danger pull-right ' . $disabled . '" data-href="' . base_url('admin/users/del/' . $row['id']) . '" data-toggle="modal" data-target="#confirm-delete"> <i class="fa fa-trash-o"></i></a>
+				 <a title="Edit" class="update btn btn-sm btn-primary pull-right" href="' . base_url('admin/users/edit/' . $row['id']) . '"> <i class="fa fa-pencil-square-o"></i></a>
+				 <a title="View" class="view btn btn-sm btn-info pull-right" href="' . base_url('admin/users/edit/' . $row['id']) . '"> <i class="fa fa-eye"></i></a>'
+			);
+		}
+		$records['data'] = $data;
+		echo json_encode($records);
+	}
+
 	public function getDataPengajuan()
 	{
-		$result = $this->data_pengajuan_model->getDataPengajuan();
+		$results = $this->data_pengajuan_model->getDataPengajuan();
+		$number_of_data = $this->data_pengajuan_model->_count_filtered_data();
 
-		print_r($result);
+		$no = $_POST['start'];
+		$data = [];
+		$row = array();
+		foreach ($results as $result) {
+			// $row[] = ++$no;
+			$data[] = [
+				$result['Jenis_Pengajuan'],
+				'<td class=' . 'table-' . $result['badge'] . '>' . $result['status_id'] . '-' . $result['status'] . '</td>',
+				$result['FULLNAME'],
+				$result['date'],
+			];
+		}
+		$data_output = $data;
+
+		$output = [
+			"draw" => $_POST["draw"],
+			"totalRecords" => $this->data_pengajuan_model->_count_all_data(),
+			"filteredRecords" => $this->data_pengajuan_model->_count_filtered_data(),
+			"data" => $data_output
+		];
+
+		$this->output->set_content_type('application/json')->set_output(json_encode($output));
+
+
+
+		// var_dump($data);
+		// die();
+		// echo "<pre>";
+		// print_r($results);
+		// echo "</pre>";
+		// echo $number_of_data;
 	}
 }

@@ -4,17 +4,26 @@
 		<div class="card card-success card-outline">
 			<div class="card-header">
 				<a class="nav-s text-danger" href="<?= base_url("admin/pengajuan/index/" . $this->session->userdata('role')); ?>">
-					<i class="fas fa-fw fa-exclamation-circle"></i> Tampilkan yang perlu diproses</a>
+					<i class="fas fa-fw fa-exclamation-circle"></i>
+					Tampilkan yang perlu diproses
+				</a>
 				</a>&nbsp;
 				<a class=" nav-lilk" href="<?= base_url("admin/pengajuan/index/"); ?>">
-					<i class="fas fa-fw fa-envelope"></i> Tampilkan semua pengajuan</a>
+					<i class="fas fa-fw fa-envelope"></i>
+					Tampilkan semua pengajuan
+				</a>
+				<a class=" nav-lilk" href="<?= base_url("admin/pengajuan/verified/"); ?>">
+					<i class="fas fa-fw fa-envelope"></i>
+					Pengajuan Telah Diverifikasi
+				</a>
 			</div>
 			<div class="card-body">
-				<?php
-				if ($query) {  ?>
+				<?php echo form_open_multipart(base_url("admin/pengajuan/verified/"), '') ?>
+				<?php if ($query) {  ?>
 					<table id="pengajuan-desc" class="table table-bordered tb-pengajuans">
 						<thead>
 							<tr>
+								<th style="width:1%"><input type="checkbox" name="" id="check_all"></th>
 								<th style="width:50%">Perihal</th>
 								<th style="width:20%">Status</th>
 								<th>Mahasiswa</th>
@@ -22,12 +31,12 @@
 							</tr>
 						</thead>
 						<tbody>
-							<!-- <pre>
-								<?php print_r($query) ?>
-							</pre> -->
 							<?php
 							foreach ($query as $pengajuan) {  ?>
 								<tr class="<? ($pengajuan['status_id'] == 2) ? 'proses' : ''; ?> <?= ($pengajuan['status_id'] == 4) ? 'perlu-revisi' : ''; ?>">
+									<td class="text-center align-middle">
+										<input type="checkbox" name="pengajuan_id[]" value="<?= $pengajuan['pengajuan_id']; ?>" class="check">
+									</td>
 									<td>
 										<a class="judul" href="<?= base_url('admin/pengajuan/detail/' . $pengajuan['pengajuan_id']); ?>">
 											<?= $pengajuan['Jenis_Pengajuan']; ?></a>
@@ -55,10 +64,19 @@
 								</tr>
 							<?php  } ?>
 						</tbody>
-						</tfoot>
 					</table>
-				<?php }
-				?>
+					<?php if ($title == 'Pengajuan yang telah diverifikasi') { ?>
+						<div class="form-group row ml-0">
+							<select name="periode_id" class="form-control col-sm-2 col-form-label mr-2" id="exampleFormControlSelect1">
+								<?php foreach ($daftar_periode as $periode) { ?>
+									<option value="<?= $periode['id_periode']; ?>"><?= $periode['nama_periode']; ?></option>
+								<?php } ?>
+							</select>
+							<input type="submit" name="submit" class="btn btn-success" value="Simpan">
+						</div>
+					<?php } ?>
+				<?php } ?>
+				<?php echo form_close() ?>
 			</div><!-- /.card-body -->
 		</div><!-- /.card -->
 	</div>
@@ -98,28 +116,20 @@
 
 <script>
 	$(document).ready(function() {
-		$('#pengajuan-desc').DataTable({
-			// 	"processing": true,
-			// 	"serverSide": true,
-			// 	"order": [],
-			// 	"ajax": {
-			// 		"url": "<?= base_url('admin/pengajuan/getDataPengajuan'); ?>",
-			// 		"type": "POST"
-			// 	},
-			// 	"columnDefs": [{
-			// 		"target": [-1],
-			// 		"orderable": false
-			// 	}]
-			<?php /*if ($this->session->userdata('role') == 1) {*/ ?>
-			// "order": [
-			// 	[1, "asc"]
-			// ]
-			<?php /*}*/ ?>
-			<?php /*if ($this->session->userdata('role') == 5) { */ ?>
-			// "order": [
-			// 	[1, "desc"]
-			// ]
-			<?php /*}*/ ?>
+		var state = false
+
+		$('#check_all').click(function() {
+			if (state == false) {
+				state = true
+				$('.check').prop('checked', true);
+			} else {
+				state = false
+				$('.check').prop('checked', false);
+			}
 		});
+
+		<?php if ($title != 'Pengajuan yang telah diverifikasi') { ?>
+			$('#pengajuan-desc').DataTable({});
+		<?php } ?>
 	});
 </script>

@@ -1,19 +1,42 @@
 <?php
 class Pengajuan_model extends CI_Model
 {
+	public function getVerifiedPengajuan()
+	{
+		$id_status = " AND ps.status_id = 7";
+
+		$query = $this->db->query(
+			"SELECT 
+			*,
+			FORMAT (ps.date, 'dd/MM/yyyy ') as date,
+			FORMAT (ps.date, 'hh:mm:ss ') as time
+			FROM Tr_Pengajuan p
+			LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
+			LEFT JOIN Mstr_Jenis_Pengajuan jp ON jp.Jenis_Pengajuan_Id = p.Jenis_Pengajuan_Id
+			LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+			LEFT JOIN Mstr_Department d ON d.DEPARTMENT_ID = m.DEPARTMENT_ID
+			WHERE ps.status_id = (SELECT MAX(status_id) FROM Tr_Pengajuan_Status ps WHERE ps.pengajuan_id = p.pengajuan_id) 
+			$id_status"
+		);
+		return $query->result_array();
+	}
+
 	public function get_pengajuan($role)
 	{
+
 		if ($this->session->userdata('role') == 1 || $this->session->userdata('role') == 5) {
 			$prodi = '';
 		} else {
 			$prodi = "AND u.id_prodi = '" . $this->session->userdata('id_prodi') . "'";
 		}
+
 		if ($role == '') {
 			$id_status = '';
 		} else if ($role == 1) {
 			$id_status = "AND ps.status_id =  9";
 		} else if ($role == 2) {
-			$id_status = "AND (ps.status_id =  2 OR ps.status_id = 5)";
+			$id_status = "AND (ps.status_id =  2 OR ps.status_id = 5 OR ps.status_id = 7)";
 		} else if ($role == 5) {
 			$id_status = "AND ps.status_id =  8";
 		} else if ($role == 6) {
@@ -119,8 +142,6 @@ class Pengajuan_model extends CI_Model
 		)->row_array();
 		// return $pengajuan_id;
 	}
-
-
 
 	public function get_no_pengajuan($id_pengajuan)
 	{

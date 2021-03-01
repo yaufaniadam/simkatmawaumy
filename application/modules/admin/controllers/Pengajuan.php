@@ -32,10 +32,23 @@ class Pengajuan extends Admin_Controller
 				if ($is_field_anggota_exist > 0) {
 					$result = $this->db->get_where('Tr_Field_Value', ['pengajuan_id' => $pengajuan_id, 'field_id' => 77])->row_object()->value;
 					$anggota = explode(',', $result);
+					foreach ($anggota as $mahasiswa) {
+						$data = [
+							'id_periode' => $periode_id,
+							'id_pengajuan' => $pengajuan_id,
+							'pic' => $_SESSION['user_id'],
+							'STUDENTID' => $mahasiswa
+						];
+						$this->db->insert('Tr_Penerbitan_Pengajuan', $data);
+						// if ($this->db->insert('Tr_Penerbitan_Pengajuan', $data)) {
+						// 	redirect(base_url('admin/pengajuan/verified'));
+						// }
+						echo '<pre>';
+						print_r($data);
+						echo '</pre>';
+					}
 				}
 			}
-
-			print_r($anggota);
 		} else {
 			$data['query'] = $this->pengajuan_model->getVerifiedPengajuan();
 			$data['title'] = 'Pengajuan yang telah diverifikasi';
@@ -535,7 +548,6 @@ class Pengajuan extends Admin_Controller
 							)
 						);
 					}
-
 
 					// kirim notifikasi
 					$data_notif = array(

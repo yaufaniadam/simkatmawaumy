@@ -22,6 +22,27 @@ class Pengajuan_model extends CI_Model
 		return $query->result_array();
 	}
 
+	public function getPengajuanPerPeriode($id_periode)
+	{
+		$query = $this->db->query(
+			"SELECT
+			*,
+			pp.STUDENTID AS mhs_id,
+			FORMAT (ps.date, 'dd/MM/yyyy ') as date,
+			FORMAT (ps.date, 'hh:mm:ss ') as time
+			FROM Tr_Pengajuan p
+			LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
+			LEFT JOIN Mstr_Jenis_Pengajuan jp ON jp.Jenis_Pengajuan_Id = p.Jenis_Pengajuan_Id
+			LEFT JOIN Tr_Penerbitan_Pengajuan pp ON pp.id_pengajuan = p.pengajuan_id
+			LEFT JOIN V_Mahasiswa m ON m.STUDENTID = pp.STUDENTID
+			LEFT JOIN Mstr_Department d ON d.DEPARTMENT_ID = m.DEPARTMENT_ID
+			WHERE ps.status_id = (SELECT MAX(status_id) FROM Tr_Pengajuan_Status ps WHERE ps.pengajuan_id = p.pengajuan_id)
+			AND pp.id_periode = '$id_periode' "
+		);
+		return $query->result_array();
+	}
+
 	public function get_pengajuan($role)
 	{
 

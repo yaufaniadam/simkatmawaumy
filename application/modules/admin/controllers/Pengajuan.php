@@ -39,16 +39,40 @@ class Pengajuan extends Admin_Controller
 							'pic' => $_SESSION['user_id'],
 							'STUDENTID' => $mahasiswa
 						];
+
 						$this->db->insert('Tr_Penerbitan_Pengajuan', $data);
-						// if ($this->db->insert('Tr_Penerbitan_Pengajuan', $data)) {
-						// 	redirect(base_url('admin/pengajuan/verified'));
-						// }
-						echo '<pre>';
-						print_r($data);
-						echo '</pre>';
 					}
+					$nim = $this->db->get_where('Tr_Pengajuan', ['pengajuan_id' => $pengajuan_id])->row_object()->nim;
+					$data = [
+						'id_periode' => $periode_id,
+						'id_pengajuan' => $pengajuan_id,
+						'pic' => $_SESSION['user_id'],
+						'STUDENTID' => $nim
+					];
+					$this->db->insert('Tr_Penerbitan_Pengajuan', $data);
+				} else {
+					$nim = $this->db->get_where('Tr_Pengajuan', ['pengajuan_id' => $pengajuan_id])->row_object()->nim;
+					$data = [
+						'id_periode' => $periode_id,
+						'id_pengajuan' => $pengajuan_id,
+						'pic' => $_SESSION['user_id'],
+						'STUDENTID' => $nim
+					];
+					$this->db->insert('Tr_Penerbitan_Pengajuan', $data);
+					$this->db->set('status_id', 9)
+						->set('pic', $this->session->userdata('user_id'))
+						->set('date', 'getdate()', FALSE)
+						->set('pengajuan_id', $pengajuan_id)
+						->insert('Tr_Pengajuan_Status');
 				}
 			}
+			$this->db->set('status_id', 9)
+				->set('pic', $this->session->userdata('user_id'))
+				->set('date', 'getdate()', FALSE)
+				->set('pengajuan_id', $pengajuan_id)
+				->insert('Tr_Pengajuan_Status');
+
+			redirect(base_url('admin/pengajuan/verified'));
 		} else {
 			$data['query'] = $this->pengajuan_model->getVerifiedPengajuan();
 			$data['title'] = 'Pengajuan yang telah diverifikasi';
@@ -145,7 +169,6 @@ class Pengajuan extends Admin_Controller
 				->insert('Tr_Pengajuan_Status');
 
 			foreach ($verifikasi as $id => $value_verifikasi) {
-
 				$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id))
 					->update(
 						'Tr_Field_Value',
@@ -247,7 +270,6 @@ class Pengajuan extends Admin_Controller
 					->set('id_pengajuan', $id_pengajuan)
 					->set('pic', $this->session->userdata('user_id'))
 					->insert('pengajuan_status');
-
 
 				if ($result) {
 					$data_notif = array(

@@ -6,6 +6,7 @@ class Periode extends Admin_Controller
 	{
 		parent::__construct();
 		$this->load->model('periode_model', 'periode_model');
+		$this->load->model('pengajuan_model', 'pengajuan_model');
 	}
 
 	public function index($status = '')
@@ -46,5 +47,17 @@ class Periode extends Admin_Controller
 			$data['view'] = 'admin/periode/tambah';
 			$this->load->view('layout/layout', $data);
 		}
+	}
+
+	public function bulan($id_periode)
+	{
+		$nama_periode = $this->db->get_where('Tr_Periode_Penerbitan', ['id_periode' => $id_periode])->row_object()->nama_periode;
+		$data['daftar_pengajuan'] = $this->pengajuan_model->getPengajuanPerPeriode($id_periode);
+		$data['title'] = 'Daftar Pengajuan Periode ' . $nama_periode;
+		$data['view'] = 'admin/penerbitan_pengajuan/index';
+
+		// var_dump($data);
+		// die();
+		$this->load->view('layout/layout', $data);
 	}
 }

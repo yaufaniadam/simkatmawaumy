@@ -17,17 +17,43 @@
 				<table id="pengajuan-desc" class="table table-bordered tb-pengajuans">
 					<thead>
 						<tr>
-							<th style="width:50%">Periode</th>
+							<th style="width:1%"><input type="checkbox" name="" id="check_all"></th>
+							<th style="width:50%">Perihal</th>
 							<th style="width:20%">Status</th>
-							<th>Tanggal Terbit</th>
+							<th>Mahasiswa</th>
+							<th>Tanggal</th>
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($daftar_periode as $periode) { ?>
-							<tr>
-								<td><a href="<?= base_url('admin/periode/bulan/' . $periode['id_periode']); ?>"><?= $periode['nama_periode']; ?></a></td>
-								<td><?= $periode['status'] == 0 ? 'Belum Diterbitkan' : 'Sudah Diterbitkan'; ?></td>
-								<td><?= $periode['tanggal'] == '' ? '-' : ''; ?></td>
+						<?php foreach ($daftar_pengajuan as $pengajuan) { ?>
+							<tr class="<? ($pengajuan['status_id'] == 2) ? 'proses' : ''; ?> <?= ($pengajuan['status_id'] == 4) ? 'perlu-revisi' : ''; ?>">
+								<td class="text-center align-middle">
+									<input type="checkbox" name="pengajuan_id[]" value="<?= $pengajuan['pengajuan_id']; ?>" class="check">
+								</td>
+								<td>
+									<a class="judul" href="<?= base_url('admin/pengajuan/detail/' . $pengajuan['pengajuan_id']); ?>">
+										<?= $pengajuan['Jenis_Pengajuan']; ?></a>
+								</td>
+								<td class="table-<?= $pengajuan['badge']; ?>"><?= $pengajuan['status_id']; ?> -
+									<?= $pengajuan['status']; ?>
+								</td>
+								<td>
+									<p class="m-0">
+										<?= $pengajuan['FULLNAME']; ?>
+									</p>
+									<!-- <p class="badge m-0 badge-ijomuda">
+										<?= $pengajuan['DEPARTMENT_ID']; ?>
+									</p> -->
+								</td>
+								<td>
+									<p class="m-0">
+										<?= $pengajuan['date'];	?>
+									</p>
+									<p class="badge m-0 badge-warning">
+										<?= $pengajuan['time'];	?>
+									</p>
+								</td>
+								</td>
 							</tr>
 						<?php } ?>
 					</tbody>

@@ -57,10 +57,6 @@
 						</tbody>
 						</tfoot>
 					</table>
-					<?php /* } else { */ ?>
-
-					<p class="lead">Saat ini belum ada pengajuan yang perlu diproses</p>
-
 				<?php }
 				?>
 			</div><!-- /.card-body -->

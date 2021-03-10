@@ -2,18 +2,11 @@
 	<div class="col-12">
 
 		<div class="card card-success card-outline">
-			<div class="card-header">
-				<a class="nav-s text-danger" href="<?= base_url("admin/periode/index/1"); ?>">
-					<i class="fas fa-fw fa-exclamation-circle"></i>
-					Sudah Diterbitkan
-				</a>
-				</a>&nbsp;
-				<a class=" nav-lilk" href="<?= base_url("admin/periode/index/0"); ?>">
-					<i class="fas fa-fw fa-envelope"></i>
-					Belum Diterbitkan
-				</a>
-			</div>
 			<div class="card-body">
+				<?= form_open(base_url('admin/periode/bulan')); ?>
+				<input type="hidden" name="id_periode" value="<?= $id_periode; ?>">
+				<input type="submit" class="btn btn-success mb-2" value="terbitkan" name="submit">
+				<?= form_close(); ?>
 				<table id="pengajuan-desc" class="table table-bordered tb-pengajuans">
 					<thead>
 						<tr>

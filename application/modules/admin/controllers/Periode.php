@@ -49,15 +49,30 @@ class Periode extends Admin_Controller
 		}
 	}
 
-	public function bulan($id_periode)
+	public function bulan($id_periode = 0)
 	{
-		$nama_periode = $this->db->get_where('Tr_Periode_Penerbitan', ['id_periode' => $id_periode])->row_object()->nama_periode;
-		$data['daftar_pengajuan'] = $this->pengajuan_model->getPengajuanPerPeriode($id_periode);
-		$data['title'] = 'Daftar Pengajuan Periode ' . $nama_periode;
-		$data['view'] = 'admin/penerbitan_pengajuan/index';
+		if ($this->input->post('submit')) {
 
-		// var_dump($data);
-		// die();
-		$this->load->view('layout/layout', $data);
+			date_default_timezone_set('Asia/Jakarta');
+			$tanggal = date("Y/m/d h:i:s");
+			$id_periode = $this->input->post('id_periode');
+			$data = [
+				'tanggal' => $tanggal,
+				'status' => 1
+			];
+
+			$this->db->where('id_periode', $id_periode);
+			$this->db->update('Tr_Periode_Penerbitan', $data);
+
+			redirect(base_url('/admin/periode'));
+		} else {
+			$nama_periode = $this->db->get_where('Tr_Periode_Penerbitan', ['id_periode' => $id_periode])->row_object()->nama_periode;
+			$data['daftar_pengajuan'] = $this->pengajuan_model->getPengajuanPerPeriode($id_periode);
+			$data['title'] = 'Daftar Pengajuan Periode ' . $nama_periode;
+			$data['id_periode'] = $id_periode;
+			$data['view'] = 'admin/penerbitan_pengajuan/index';
+
+			$this->load->view('layout/layout', $data);
+		}
 	}
 }

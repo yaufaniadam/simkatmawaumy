@@ -27,8 +27,10 @@ class Pengajuan extends Admin_Controller
 			$periode_id = $this->input->post('periode_id');
 
 			foreach ($daftar_pengajuan_id as $pengajuan_id) {
+
 				$jenis_pengajuan_id = $this->db->get_where('Tr_Pengajuan', ['pengajuan_id' => $pengajuan_id])->row_object()->Jenis_Pengajuan_Id;
 				$is_field_anggota_exist = $this->db->get_where('Tr_Pengajuan_Field', ['Jenis_Pengajuan_Id' => $jenis_pengajuan_id, 'field_id' => 77])->num_rows();
+
 				if ($is_field_anggota_exist > 0) {
 					$result = $this->db->get_where('Tr_Field_Value', ['pengajuan_id' => $pengajuan_id, 'field_id' => 77])->row_object()->value;
 					$anggota = explode(',', $result);
@@ -77,7 +79,7 @@ class Pengajuan extends Admin_Controller
 			$data['query'] = $this->pengajuan_model->getVerifiedPengajuan();
 			$data['title'] = 'Pengajuan yang telah diverifikasi';
 			$data['view'] = 'pengajuan/index';
-			$data['daftar_periode'] = $this->periode_model->getPeriode('');
+			$data['daftar_periode'] = $this->periode_model->getPeriode('0');
 			$this->load->view('layout/layout', $data);
 		}
 	}

@@ -64,11 +64,27 @@ class Periode extends Admin_Controller
 			$this->db->where('id_periode', $id_periode);
 			$this->db->update('Tr_Periode_Penerbitan', $data);
 
+			$this->db->select('id_pengajuan');
+			$this->db->distinct();
+			$this->db->from('Tr_Penerbitan_Pengajuan');
+			$this->db->where(['id_periode' => $id_periode]);
+			$this->db->group_by('id_pengajuan');
+			$result = $this->db->get()->result_array();
+
+			foreach ($result as $pengajuan) {
+				$this->db->set('status_id', 7)
+					->set('pic', $this->session->userdata('user_id'))
+					->set('date', 'getdate()', FALSE)
+					->set('pengajuan_id', $pengajuan['id_pengajuan'])
+					->insert('Tr_Pengajuan_Status');
+			}
 			redirect(base_url('/admin/periode'));
 		} else {
 			$nama_periode = $this->db->get_where('Tr_Periode_Penerbitan', ['id_periode' => $id_periode])->row_object()->nama_periode;
+			$status_periode = $this->db->get_where('Tr_Periode_Penerbitan', ['id_periode' => $id_periode])->row_object()->status;
 			$data['daftar_pengajuan'] = $this->pengajuan_model->getPengajuanPerPeriode($id_periode);
 			$data['title'] = 'Daftar Pengajuan Periode ' . $nama_periode;
+			$data['status_periode'] = $status_periode;
 			$data['id_periode'] = $id_periode;
 			$data['view'] = 'admin/penerbitan_pengajuan/index';
 

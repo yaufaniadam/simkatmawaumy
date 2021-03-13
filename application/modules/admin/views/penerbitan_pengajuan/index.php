@@ -3,16 +3,19 @@
 
 		<div class="card card-success card-outline">
 			<div class="card-body">
-				<?= form_open(base_url('admin/periode/bulan')); ?>
-				<input type="hidden" name="id_periode" value="<?= $id_periode; ?>">
-				<input type="submit" class="btn btn-success mb-2" value="terbitkan" name="submit">
-				<?= form_close(); ?>
+				<?php if ($status_periode == 0) { ?>
+					<?= form_open(base_url('admin/periode/bulan')); ?>
+					<input type="hidden" name="id_periode" value="<?= $id_periode; ?>">
+					<input type="submit" class="btn btn-success mb-2" value="terbitkan" name="submit">
+					<?= form_close(); ?>
+				<?php } ?>
 				<table id="pengajuan-desc" class="table table-bordered tb-pengajuans">
 					<thead>
 						<tr>
 							<th style="width:1%"><input type="checkbox" name="" id="check_all"></th>
-							<th style="width:50%">Perihal</th>
-							<th style="width:20%">Status</th>
+							<th style="width:40%">Perihal</th>
+							<th style="width:35%">Judul Kegiatan</th>
+							<th style="width:25%">Status</th>
 							<th>Mahasiswa</th>
 							<th>Tanggal</th>
 						</tr>
@@ -26,6 +29,8 @@
 								<td>
 									<a class="judul" href="<?= base_url('admin/pengajuan/detail/' . $pengajuan['pengajuan_id']); ?>">
 										<?= $pengajuan['Jenis_Pengajuan']; ?></a>
+								</td>
+								<td class="table-<?= $pengajuan['badge']; ?>">
 								</td>
 								<td class="table-<?= $pengajuan['badge']; ?>"><?= $pengajuan['status_id']; ?> -
 									<?= $pengajuan['status']; ?>

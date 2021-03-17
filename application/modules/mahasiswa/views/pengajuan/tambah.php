@@ -2,41 +2,7 @@
 
 <div class="row">
 	<div class="col-md-8 mb-4">
-		<?php /* if ($pengajuan->status_id == 7) { ?>
 
-			<div class="card shadow mb-3">
-				<a href="#collPengantar" class="d-block card-header pt-3 pb-2 bg-tosca" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collPengantar">
-					<p class="h6 font-weight-bold text-white">Pengantar</p>
-				</a>
-				<div class="collapse show" id="collPengantar">
-					<div class="card-body">
-						<!-- <p class="font-italic">Assalamu'alaikum warahmatullahi wabarakatuh</p> -->
-						<p> Pengajuan anda sudah diterima </p>
-						<p> Silahkan menunggu petunjuk selanjutnya untuk mencairkan dana </p>
-
-						<table class="mb-3 ml-3 table-striped" style="width:95%">
-							<tr>
-								<td style="width:150px;">Nama</td>
-								<td> : <?= $pengajuan->FULLNAME; ?></td>
-							</tr>
-							<tr>
-								<td>NIM</td>
-								<td> : <?= $pengajuan->nim; ?></td>
-							</tr>
-							<tr>
-								<td>Program Studi</td>
-								<td> : <?= $pengajuan->NAME_OF_DEPARTMENT; ?></td>
-							</tr>
-							<tr>
-								<td>Jenis Surat</td>
-								<td> : <?= $pengajuan->Jenis_Pengajuan; ?></td>
-							</tr>
-						</table>
-					</div>
-				</div>
-			</div>
-
-		<?php } */ ?>
 		<div class="card shadow">
 			<a href="#collKeterangan" class="d-block card-header pt-3 pb-2 bg-abumuda <?= ($pengajuan->status_id == 10) ? "collapsed" : "" ?>" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collKeterangan">
 				<p class="h6 font-weight-bold text-white">Keterangan</p>
@@ -61,18 +27,19 @@
 							</label>
 
 							<div class="col-md-7">
-								<?php generate_form_field($pengajuan_field['field_id'], $pengajuan_id, $pengajuan_status); ?>
+								<?php generate_form_field($pengajuan_field['field_id'], $pengajuan_id, $pengajuan_status, 'mahasiswa/pengajuan'); ?>
 							</div>
 						</div>
 
 					<?php  }  ?>
 
 					<?php if ($pengajuan->status_id == 4) { ?>
-						<input type="hidden" name="revisi" value="1">
+						<input type="hidden" name="status" value="4">
 						<input class="btn btn-lg btn-<?= $pengajuan->badge; ?> btn-block" type="submit" name="submit" value="<?= ($pengajuan->status_id == '4') ? " Kirim Revisi Data" : "Ajukan Surat " . $pengajuan->Jenis_Pengajuan; ?>" />
 
-					<?php } elseif ($pengajuan->status_id == 1) { ?>
-						<input class="btn btn-lg btn-<?= $pengajuan->badge; ?> btn-block" type="submit" name="submit" value="Ajukan Surat <?= $pengajuan->Jenis_Pengajuan; ?>" />
+					<?php } elseif ($pengajuan->status_id == 1 || $pengajuan->status_id == 2) { ?>
+						<input type="hidden" name="status" value="<?= ($pengajuan->status_id == 1) ? '1' : '2' ?>">
+						<input class="btn btn-lg btn-<?= $pengajuan->badge; ?> btn-block" type="submit" name="submit" value="<?= ($pengajuan->status_id == 1) ? 'Ajukan Prestasi' : 'Simpan perubahan' ?> " />
 					<?php } ?>
 
 					<?php echo form_close();  ?>
@@ -116,7 +83,7 @@
 			</div>
 		</div>
 
-		<?php if ($pengajuan->status_id == 7) { ?>
+		<!-- <?php if ($pengajuan->status_id == 7) { ?>
 			<div class="card shadow mt-3">
 				<a href="#collterbit" class="d-block card-header pt-3 pb-2 bg-success" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collterbit">
 					<p class="h6 font-weight-bold text-white">Blangko Pencairan Dana</p>
@@ -129,7 +96,7 @@
 					</div>
 				</div>
 			</div>
-		<?php } ?>
+		<?php } ?> -->
 
 
 	</div>

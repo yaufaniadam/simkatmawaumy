@@ -196,6 +196,9 @@ text-align: center;
 }
 .dm-uploader.active {
 border-color: red;
-
 border-style: solid;
 } 
+
+.dm-uploader.is-invalid { 
+  border: 3px dashed rgb(197, 88, 88); 
+}

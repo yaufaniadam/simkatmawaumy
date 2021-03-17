@@ -31,6 +31,7 @@
 										<?= $pengajuan['Jenis_Pengajuan']; ?></a>
 								</td>
 								<td class="table-<?= $pengajuan['badge']; ?>">
+									<?php echo get_meta_value('judul', $pengajuan['pengajuan_id'], false); ?>
 								</td>
 								<td class="table-<?= $pengajuan['badge']; ?>"><?= $pengajuan['status_id']; ?> -
 									<?= $pengajuan['status']; ?>

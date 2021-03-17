@@ -26,12 +26,7 @@
 		</a>
 	</li>
 
-	<li class="nav-item" id="semua_pengajuan">
-		<a class="nav-link" href="<?= base_url("admin/periode/index/"); ?>">
-			<i class="fas fa-fw fa-envelope"></i>
-			<span>Periode</span>
-		</a>
-	</li>
+
 
 	<li class="nav-item" id="semua_pengajuan">
 		<a class="nav-link" href="<?= base_url("admin/pengajuan/arsip/0/0") ?>">
@@ -39,7 +34,6 @@
 			<span>Arsip Pengajuan</span>
 		</a>
 	</li>
-
 
 	<?php if ($this->session->userdata('role') == 1) { ?>
 
@@ -49,7 +43,7 @@
 			Pengaturan
 		</div>
 
-		</li>
+
 		<li class="nav-item" id="menu_pengguna">
 			<a class="nav-link" href="<?= base_url("admin/pengguna"); ?>">
 				<i class="fas fa-fw fa-users"></i>
@@ -61,6 +55,20 @@
 				<i class="fas fa-fw fa-list"></i>
 				<span>Jenis Pengajuan</span></span></a>
 		</li>
+
+		<li class="nav-item" id="semua_pengajuan">
+			<a class="nav-link" href="<?= base_url("admin/periode/index/"); ?>">
+				<i class="fas fa-fw fa-envelope"></i>
+				<span>Periode</span>
+			</a>
+		</li>
+
+		<li class="nav-item" id="menu_kategoripengajuan">
+			<a class="nav-link" href="<?= base_url("admin/jenispengajuan"); ?>">
+				<i class="fas fa-fw fa-list"></i>
+				<span>Nominal Reward</span></span></a>
+		</li>
+
 	<?php } // ednif role = 1
 	?>
 

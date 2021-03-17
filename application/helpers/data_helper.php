@@ -345,3 +345,28 @@ function check_child($id)
 	$query = $CI->db->query("SELECT * FROM dbo.Mstr_Jenis_Pengajuan where parent='$id'");
 	return $query;
 }
+
+function get_meta_value($key, $id_pengajuan, $file)
+{
+	$CI = &get_instance();
+
+	$value = $CI->db->select("*")
+		->from('Mstr_Fields mf')
+		->join('Tr_Field_Value fv', 'mf.field_id=fv.field_id', 'left')
+		->where(array("mf.key" => $key, 'fv.pengajuan_id' => $id_pengajuan))
+		->get()
+		->row_array();
+
+	if ($file == true) {
+		$media = $CI->db->select("*")->from('Tr_Media')->where(array('id' => $value['value']))->get()->row_array();
+		$filename = explode('/dokumen/', $media['file']);
+		return array(
+			'file_id' => $media['id'],
+			'file' => $media['file'],
+			'thumb' => $media['thumb'],
+			'filename' => $filename[1],
+		);
+	} else {
+		return $value['value'];
+	}
+}

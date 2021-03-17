@@ -265,11 +265,15 @@ class Pengajuan extends Mahasiswa_Controller
 
 		if ($this->input->post("submit")) {
 
-			if ($this->input->post('revisi')) {
-				$id_status = 5;
-			} else {
-				$id_status = 2;
+			$id_status =	$this->input->post('status');
+
+			if ($id_status == 1) {
+				$next_status = 2;
+			} elseif ($id_status == 4) {
+				$next_status = 5;
 			}
+
+			//echo $id_status;
 
 			$data_user = $this->session->userdata('user_id');
 			foreach ($this->input->post('dokumen') as $id => $dokumen) {
@@ -292,35 +296,36 @@ class Pengajuan extends Mahasiswa_Controller
 				$this->load->view('layout/layout', $data);
 			} else {
 
-				$insert = $this->db->set('pengajuan_id', $pengajuan_id)
-					->set('status_id', $id_status)
-					->set('pic', $data_user['STUDENTID'])
-					->set('date', date('Y-m-d h:m:s'))
-					->insert('Tr_Pengajuan_Status');
-
-				if ($insert) {
-					foreach ($this->input->post('dokumen') as $id => $dokumen) {
-						if (is_array($dokumen)) {
-							$anggota = implode(",", $dokumen);
-							$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-							$this->db->update(
-								'Tr_Field_Value',
-								array(
-									'value' => $anggota
-								)
-							);
-						} else {
-							$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-							$this->db->update(
-								'Tr_Field_Value',
-								array(
-									'value' => $dokumen
-								)
-							);
-						}
-					}
-					redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
+				if ($id_status == 1 || $id_status == 4) {
+					$insert = $this->db->set('pengajuan_id', $pengajuan_id)
+						->set('status_id', $next_status)
+						->set('pic', $data_user['STUDENTID'])
+						->set('date', date('Y-m-d h:m:s'))
+						->insert('Tr_Pengajuan_Status');
 				}
+
+				foreach ($this->input->post('dokumen') as $id => $dokumen) {
+					if (is_array($dokumen)) {
+						$anggota = implode(",", $dokumen);
+						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+						$this->db->update(
+							'Tr_Field_Value',
+							array(
+								'value' => $anggota
+							)
+						);
+					} else {
+						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+						$this->db->update(
+							'Tr_Field_Value',
+							array(
+								'value' => $dokumen
+							)
+						);
+					}
+				}
+
+				redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 			}
 		} else {
 			$data['view'] = 'pengajuan/tambah';
@@ -379,20 +384,18 @@ class Pengajuan extends Mahasiswa_Controller
 					)
 				);
 
-				$thumb = $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext'];
+				$thumb = $data['raw_name'] . '_thumb' . $data['file_ext'];
 			} else {
+				$thumb = '';
 				// $result = 
 				$this->db->insert(
 					'Tr_Media',
 					array(
 						'nim' => $this->session->userdata('studentid'),
 						'file' =>  $upload_path . '/' . $data['file_name'],
-						'thumb' => 'public/dist/img/document.png'
+						'thumb' => $thumb
 					)
 				);
-
-
-				$thumb = 'public/dist/img/document.png';
 			}
 
 			echo json_encode(
@@ -423,6 +426,37 @@ class Pengajuan extends Mahasiswa_Controller
 		}
 	}
 
+	public function hapus_file()
+	{
+		$id = $_POST['id'];
+		$media = $this->db->get_where('Tr_Media', array('id' => $id))->row_array();
+		$exist = is_file($media['thumb']);
+
+		if ($media['thumb']) {
+			if (is_file($media['thumb'])) {
+				unlink($media['thumb']);
+				$thumb = 'deleted';
+			}
+		}
+		if ($media['file']) {
+			if (is_file($media['file'])) {
+				unlink($media['file']);
+				$file = 'deleted';
+			}
+		}
+
+		$hapus = $this->db->delete('Tr_Media', array('id' => $id));
+		// if ($hapus) {
+		echo json_encode(array(
+			"statusCode" => 200,
+			"id" => $id,
+			'thumb' => ($media['thumb']) ? $thumb : 'gada',
+			'file' => ($media['file']) ? $file : 'gada',
+			'hapus' => $hapus
+		));
+		//}
+	}
+
 	public function get_used_file_name()
 	{
 		$used_file_id = $this->input->post('id');
@@ -432,6 +466,52 @@ class Pengajuan extends Mahasiswa_Controller
 		$file_name = explode("/", $file_dir);
 
 		echo json_encode($file_name[2]);
+	}
+
+	public function tampil_pengajuan($id_surat)
+	{
+
+		$data['title'] = 'Tampil Surat';
+		$data['pengajuan'] = $this->pengajuan_model->get_detail_pengajuan($id_surat);
+
+		echo '<pre>';
+		print_r($data['pengajuan']);
+		echo '</pre>';
+
+		// $data['no_surat'] = $this->pengajuan_model->get_no_surat($id_surat);
+		// $kategori = $data['surat']['kategori_surat'];
+		// $nim = $data['surat']['username'];
+
+		//$this->load->view('admin/surat/tampil_surat', $data);
+
+		// $mpdf = new \Mpdf\Mpdf([
+		// 	'tempDir' => __DIR__ . '/pdfdata',
+		// 	'mode' => 'utf-8',
+		// 	// 'format' => [24, 24],
+		// 	'format' => 'A4',
+		// 	'margin_left' => 0,
+		// 	'margin_right' => 0,
+		// 	'margin_bottom' => 20,
+		// 	'margin_top' => 30,
+		// 	'float' => 'left'
+		// ]);
+
+		// $view = $this->load->view('mahasiswa/pengajuan/tampil_pengajuan', $data, TRUE);
+
+		// $mpdf->SetHTMLHeader('
+		// <div style="text-align: left; margin-left:2cm">
+		// 		<img width="390" height="" src="' . base_url() . '/public/dist/img/logokop-lpka.jpg" />
+		// </div>');
+		// $mpdf->SetHTMLFooter('
+
+		// <div style="text-align:center; background:red;">
+		// 	<img width="" height="" src="' . base_url() . '/public/dist/img/footerkop-lpka.jpg" />
+		// </div>');
+
+		// $mpdf->WriteHTML($view);
+
+		// //		$mpdf->Output('Surat-' . $kategori . '-' . $nim . '.pdf', 'D');
+		// $mpdf->Output('Surat-.pdf', 'D');
 	}
 
 	function _create_thumbs($upload_data)

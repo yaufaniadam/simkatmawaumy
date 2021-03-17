@@ -39,7 +39,7 @@ class Periode extends Admin_Controller
 					'nama_periode' => $this->input->post('nama_periode')
 				];
 				if ($this->periode_model->tambahPeriode($data)) {
-					redirect(base_url('admin/periode/index'));
+					redirect(base_url('admin/periode/tambah_nominal'));
 				}
 			}
 		} else {
@@ -49,6 +49,10 @@ class Periode extends Admin_Controller
 		}
 	}
 
+	public function tambah_nominal($id_periode)
+	{
+		echo "tambah nomina";
+	}
 	public function bulan($id_periode = 0)
 	{
 		if ($this->input->post('submit')) {

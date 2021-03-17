@@ -21,55 +21,36 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 				<?= $this->session->flashdata('msg'); ?>
 			</div>
 		<?php endif; ?>
-		<!-- Surat diproses oleh Kaprodi -->
-		<?php if (($pengajuan['status_id'] == 3 || $pengajuan['status_id'] == 7) && $this->session->userdata('role') == 6) { ?>
 
-			<div class="card shadow mb-3">
-				<a href="#collPengantar" class="d-block card-header pt-3 pb-2 bg-tosca" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collPengantar">
-					<p class="h6 font-weight-bold text-white">Pengantar</p>
-				</a>
-				<div class="collapse show" id="collPengantar">
-					<div class="card-body">
-						<p class="font-italic">Assalamu'alaikum warahmatullahi wabarakatuh</p>
-						<p> Kepada Yth. Kepala Program Studi <?= $pengajuan['prodi']; ?>, mohon kesediaanya untuk memberikan persetujuan pada surat yang diajukan oleh:</p>
+		<?php
+		if (
+			($pengajuan['status_id'] == 8 && $this->session->userdata('role') == 5) ||
+			($pengajuan['status_id'] == 7 && $this->session->userdata('role') == 6)
+		) {
+			echo form_open('admin/pengajuan/disetujui');
+		}
 
-						<table class="mb-3 ml-3 table-striped" style="width:95%">
-							<tr>
-								<td style="width:150px;">Nama</td>
-								<td> : <?= $pengajuan['FULLNAME']; ?></td>
-							</tr>
-							<tr>
-								<td>NIM</td>
-								<td> : <?= $pengajuan['username']; ?></td>
-							</tr>
-							<tr>
-								<td>Jenis Surat</td>
-								<td> : <?= $pengajuan['Jenis_Pengajuan']; ?></td>
-							</tr>
-						</table>
+		if (($pengajuan['status_id'] == 2 || $pengajuan['status_id'] == 5) && $this->session->userdata('role') == 2) {
+			echo form_open('admin/pengajuan/verifikasi');
+		}
 
-						<p> Adapun kelengkapan administratif yang dibutuhkan sudah diverifikasi kebenarannya oleh staf Tata Usaha <?= $pengajuan['prodi']; ?>.</p>
+		if (($pengajuan['status_id'] == 7) && $this->session->userdata('role') == 2) {
+			echo form_open('admin/pengajuan/selesai');
+		}
+		?>
 
-						<p>Demikian pengatar dari kami, atas perhatiannya kami ucapkan terima kasih.</p>
-						<p class="font-italic">Wassalamu'alaikum warahmatullahi wabarakatuh</p>
-					</div>
-				</div>
-			</div>
-
-		<?php } ?>
-
-		<!-- Surat diproses oleh Direktur -->
+		<!-- Surat diverifikasi oleh staf-->
 		<?php if (($pengajuan['status_id'] == 7) && $this->session->userdata('role') == 2) { ?>
 
 			<div class="card shadow mb-3">
 				<a href="#collPengantar" class="d-block card-header pt-3 pb-2 bg-tosca" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collPengantar">
-					<p class="h6 font-weight-bold text-white">Pengantar</p>
+					<p class="h6 font-weight-bold text-white">Pencairan Dana</p>
 				</a>
 				<div class="collapse show" id="collPengantar">
 					<div class="card-body">
 						<!-- <p class="font-italic">Assalamu'alaikum warahmatullahi wabarakatuh</p> -->
-						<p> Pengajuan anda sudah diterima </p>
-						<p> Silahkan menunggu petunjuk selanjutnya untuk mencairkan dana </p>
+						<p> Assalamualaikum, </p>
+						<p> Mohon diproses pencairan dana untuk mahasiswa berikut ini: </p>
 
 						<table class="mb-3 ml-3 table-striped" style="width:95%">
 							<tr>
@@ -90,11 +71,15 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 							</tr>
 						</table>
 
+						<?php if ($pengajuan['status_id'] == 7 && $this->session->userdata('role') == 2) { ?>
+							<div class="form-row pt-3">
+								<div class="col-md-12">
+									<input type="submit" id="sub1" value="Klik jika sudah dicairkan" name="submit" class="btn btn-perak btn-md btn-block">
+								</div>
+							</div>
+						<?php } ?>
 
-						<!-- <p> Adapun kelengkapan administratif yang dibutuhkan sudah diverifikasi kebenarannya oleh staf Tata Usaha dan telah disetujui oleh Ketua Program Studi <?= $pengajuan['NAME_OF_DEPARTMENT']; ?>.</p> -->
 
-						<!-- <p>Demikian pengatar dari kami, atas perhatiannya kami ucapkan terima kasih.</p> -->
-						<!-- <p class="font-italic">Wassalamu'alaikum warahmatullahi wabarakatuh</p> -->
 					</div>
 				</div>
 			</div>
@@ -108,24 +93,7 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 			<div class="collapse<?= (($pengajuan['status_id'] == 9 || $pengajuan['status_id'] == 10) && $this->session->userdata('role') == 1) ? "" : " show" ?>" id="collKeterangan">
 				<div class="card-body">
 
-					<?php
-					if (
-						($pengajuan['status_id'] == 8 && $this->session->userdata('role') == 5) ||
-						($pengajuan['status_id'] == 7 && $this->session->userdata('role') == 6)
-					) {
-						echo form_open('admin/pengajuan/disetujui');
-					}
 
-					if (($pengajuan['status_id'] == 2 || $pengajuan['status_id'] == 5) && $this->session->userdata('role') == 2) {
-						echo form_open('admin/pengajuan/verifikasi');
-					}
-
-					if (($pengajuan['status_id'] == 7) && $this->session->userdata('role') == 2) {
-						echo form_open('admin/pengajuan/selesai');
-					}
-
-
-					?>
 					<?= ($pengajuan['status_id'] == 1) ? '<a href="' . base_url('admin/pengajuan/proses_surat/' . $pengajuan['pengajuan_id']) . '" class="btn btn-warning btn-sm">Klik untuk Memproses</a>' : '' ?>
 
 					<input type="hidden" name="pengajuan_id" value="<?= $pengajuan['pengajuan_id']; ?>">
@@ -257,13 +225,6 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 						</div>
 					<?php }
 
-					if ($pengajuan['status_id'] == 7 && $this->session->userdata('role') == 2) { ?>
-						<div class="form-row pt-3">
-							<div class="col-md-12">
-								<input type="submit" id="sub1" value="Dana sudah dicairkan" name="submit" class="btn btn-perak btn-md btn-block">
-							</div>
-						</div>
-					<?php }
 
 					if ($pengajuan['status_id'] == 7 && $this->session->userdata('role') == 6) { ?>
 						<div class="form-row pt-3">
@@ -441,7 +402,7 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 			</div>
 		<?php } ?>
 
-		<!-- jika surat sudah diterbitkan -->
+		<!-- jika surat sudah diterbitkan --
 		<?php if ($pengajuan['status_id'] == 7) { ?>
 			<div class="card shadow mt-3">
 				<a href="#collterbit" class="d-block card-header pt-3 pb-2 bg-success" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collterbit">
@@ -454,7 +415,7 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 					</div>
 				</div>
 			</div>
-		<?php } ?>
+		<?php } ?>-->
 
 	</div>
 

@@ -370,3 +370,8 @@ function get_meta_value($key, $id_pengajuan, $file)
 		return $value['value'];
 	}
 }
+function get_file($id)
+{
+	$CI = &get_instance();
+	return	$media = $CI->db->select("*")->from('Tr_Media')->where(array('id' => $id))->get()->row_array();
+}

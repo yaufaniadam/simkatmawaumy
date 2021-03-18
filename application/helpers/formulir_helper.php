@@ -58,35 +58,89 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     ?>
     <link href="<?= base_url() ?>public/plugins/dm-uploader/dist/css/jquery.dm-uploader.min.css" rel="stylesheet">
 
-    <!-- Our markup, the important part here! -->
 
-    <?php if (validation_errors()) {
-      //cetak value yang sudah ada
+    <?php if (validation_errors()) { // cek adakah eror validasi
+      // kondisional di bawah untuk memeriksa, erornya pada field ini ataukah pada field lain
       if (set_value('dokumen[' . $id . ']')) {
-        echo '';
+        // error di field lain       
+        $form = 'd-none';
+        $listing = 'd-block';
+        $error = '';
+      } else {
+        // error di field ini
+        $form = 'd-block';
+        $listing = 'd-none';
+        $error = 'is-invalid';
       }
-      echo "ada error";
     } else {
-      echo  $field_value;
+      //tampilan default, saat value field 0, atau field sudah ada isinya dan menunggu verifikasi
+      if ($field_value) {
+        //field sudah dicek, tapi perlu direvisi
+        if ($verifikasi == 0 && $pengajuan_status == 4) {
+          //field memiliki isi
+          $form = 'd-block';
+          $listing = 'd-none';
+          $error = 'is-invalid';
+        } else {
+          $form = 'd-none';
+          $listing = 'd-block';
+          $error = '';
+        }
+      } else {
+        //field kosong
+        $form = 'd-block';
+        $listing = 'd-none';
+        $error = '';
+      }
     }
+    // (($verifikasi == 0) && ($pengajuan_status == 4) ? '' : $field_value);  
     ?>
 
+    <!-- pad akondisi default (data value kosong), form dNd muncul, listing tidak muncul -->
+    <br>
+    <input type="hidden" class="id-dokumen <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') : (($verifikasi == 0) && ($pengajuan_status == 4) ? '' : $field_value);  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
 
-    <div id="drag-and-drop-zone" class="dm-uploader <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?> p-3 <?= ($field_value) ? "d-none" : ""; ?>">
-      <h5 class="mb-2 mt-2 text-muted">Seret &amp; lepaskan berkas di sini</h5>
+    <div class="tampilUploader">
+      <div id="drag-and-drop-zone" class="dm-uploader p-3 <?= $form; ?> <?= $error; ?>">
+        <h5 class="mb-2 mt-2 text-muted">Seret &amp; lepaskan berkas di sini</h5>
 
-      <div class="btn btn-primary btn-block mb-2">
-        <span>Atau klik untuk mengunggah</span>
-        <input type="file" title='Klik untuk mengunggah' />
-      </div>
-    </div><!-- /uploader -->
-    <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+        <div class="btn btn-primary btn-block mb-2">
+          <span>Atau klik untuk mengunggah</span>
+          <input type="file" title='Klik untuk mengunggah' />
+        </div>
+      </div><!-- /uploader -->
 
-    <input type="hidden" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" class="id-dokumen" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" />
+      <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+      <!-- <span class="<?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? '' : 'd-none'; ?> text-danger"><i class="fas fa-exclamation-triangle"></i> Berkas berikut ini perlu direvisi.</span> -->
 
-    <ul class="list-unstyled p-2 d-flex flex-column col" id="files">
-      <li class="text-muted text-center empty">Belum ada file yang diupload.</li>
-    </ul>
+      <ul class="list-unstyled p-2 d-flex flex-column col" id="files" style="border:1px solid #ddd; border-radius:4px;">
+        <li class="text-muted text-center empty <?= (validation_errors()) ? (set_value('dokumen[' . $id . ']') ? 'd-none' : 'ga ada value') :  'd-none'  ?>">Belum ada file yang diupload.</li>
+
+        <li class="media <?= $listing; ?>">
+          <div class="media-body mb-1">
+            <p class="mb-2">
+              <?php
+              if (set_value('dokumen[' . $id . ']')) {
+                $id_file = set_value('dokumen[' . $id . ']');
+              } else {
+                $id_file = $field_value;
+              }
+
+              $file = get_file($id_file);
+              if ($file) {
+                $filename = explode('/dokumen/', $file['file']);
+              }
+              ?>
+              <strong><?= ($file) ? $filename['1'] : ''; ?></strong> <span class="text-muted"></span>
+            </p>
+            <div class="buttonedit"> <a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url($file['file']); ?>'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser btn btn-sm btn-danger <?= ($verifikasi == 0 && $pengajuan_status == 5 || $pengajuan_status == 7) ? 'd-none' : ''; ?>' data-id='<?= $file['id']; ?>'> <i class='fas fa-pencil-alt'></i> Ganti</a></div>
+          </div>
+        </li>
+
+      </ul>
+
+
+    </div>
 
     <script src="<?= base_url() ?>/public/plugins/dm-uploader/dist/js/jquery.dm-uploader.min.js"></script>
     <script>
@@ -245,6 +299,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
               ele.fadeOut().remove();
               $('#files').find('div.empty').fadeIn();
               $('#drag-and-drop-zone').fadeIn('400');
+              $('#drag-and-drop-zone').removeClass('d-none');
               $('#files').find('li.empty').show();
               $('.id-dokumen').val('');
             }
@@ -261,15 +316,9 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
         <div class="media-body mb-1">
           <p class="mb-2">
             <strong>%%filename%%</strong> - Status: <span class="text-muted">Waiting</span>
-
           </p>
 
           <div class="buttonedit"></div>
-
-          <!-- <div class="progress mb-2">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-            </div>
-          </div> -->
         </div>
       </li>
     </script>
@@ -281,7 +330,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
   <?php } elseif ($fields['type'] == 'textarea') {  ?>
 
-    <textarea class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 &&  $verifikasi == 1 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?>><?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?></textarea>
+    <textarea class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?>><?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?></textarea>
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
   <?php } elseif ($fields['type'] == 'date_range') {  ?>
@@ -315,7 +364,41 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     </script>
 
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+    <!--  Piih Pembimbing -->
+  <?php } elseif ($fields['type'] == 'select_pembimbing') {  ?>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
+    <select type="text" class="<?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?>></select>
+    <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $('.<?= $fields['key']; ?>').select2({
+          ajax: {
+            url: '<?= base_url('mahasiswa/pengajuan/getpembimbing'); ?>',
+            dataType: 'json',
+            type: 'post',
+            delay: 250,
+            data: function(params) {
+              return {
+                search: params.term,
+              }
+            },
+            processResults: function(data) {
+              return {
+                results: data
+              };
+            },
+            cache: true
+          },
+          placeholder: 'Pilih Dosen Pembimbing',
+          minimumInputLength: 3,
+          // templateResult: formatRepo,
+          // templateSelection: formatRepoSelection
+        });
+      });
+    </script>
   <?php } elseif ($fields['type'] == 'ta') { ?>
     <select class="form-control
 <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> 
@@ -358,9 +441,9 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-    <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" name="dokumen[<?= $id; ?>][]" multiple>
+    <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" name="dokumen[<?= $id; ?>][]" multiple>
       <?php
-      if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 4 && $verifikasi == 0) {
+      if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 3 && $verifikasi == 0) {
       } else {
       ?>
         <?php foreach ($anggota_array as $anggota) { ?>
@@ -370,13 +453,14 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
       }
       ?>
     </select>
+
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <script>
       $(document).ready(function() {
         <?php
-        if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 4 && $verifikasi == 0) {
+        if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 3 && $verifikasi == 0) {
         } else {
         ?>
           var selectedValuesTest = [
@@ -416,7 +500,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
 
 
-<?php
+  <?php
   } // endif file 
 }
 
@@ -425,7 +509,340 @@ function fileUploaderModal()
 }
 
 
+//menampilkan kategori keterangan surat
+function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
+{
+  $id = $field_id;
+  $CI = &get_instance();
+  $fields = $CI->db->select('*')->from('Mstr_Fields f')
+    ->join('Tr_Field_Value fv', 'fv.field_id=f.field_id', 'left')
+    ->where(array('f.field_id' => $id))
+    ->where(array('fv.pengajuan_id' => $id_surat))
+    ->get()->row_array();
 
+  if ($fields['type'] == 'image') {
+    $image = $CI->db->select('*')->from('Tr_Media')
+      ->where(array('id' => $fields['value']))->get()->row_array();
+    $img_full = $image['file'];
+    $thumb = $image['thumb'];
+    $image = base_url($thumb);
+  ?>
+    <figure style="background:url('<?= $image; ?>') center center no-repeat" class="d-flex align-items-start justify-content-start preview-dokumen">
+      <a data-href="<?= base_url($img_full); ?>" class="opener btn btn-warning btn-md" type="button" data-toggle="modal" data-target="#fileZoom"><i class="fas fa-search-plus" data-toggle="tooltip" data-placement="top" title="Klik untuk memperbesar"></i></a>
+    </figure>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+
+      && ($CI->session->userdata('role') == 2)
+
+    ) { ?>
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : '';  ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+    <?php }
+  } elseif ($fields['type'] == 'textarea') { ?>
+
+    <textarea class="form-control mb-2" id="input-<?= $id; ?>" disabled><?= $fields['value'];  ?></textarea>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php }
+  } elseif ($fields['type'] == 'text') { ?>
+
+    <input type="text" class="form-control mb-2  <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" disabled value="<?= $fields['value'];  ?>" />
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php }
+  } elseif ($fields['type'] == 'date_range') { ?>
+
+    <input type="text" class="form-control mb-2" id="input-<?= $id; ?>" disabled value="<?= $fields['value'];  ?>" />
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php }
+  } elseif ($fields['type'] == 'sem') { ?>
+
+    <input type="text" class="form-control mb-2" id="input-<?= $id; ?>" disabled value="<?= $fields['value'];  ?>"></input>
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php }
+  } elseif ($fields['type'] == 'ta') { ?>
+
+    <input type="text" class="form-control mb-2" id="input-<?= $id; ?>" disabled value="<?= $fields['value'];  ?>"></input>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php }
+  } elseif ($fields['type'] == 'select_pembimbing') {
+    $CI = &get_instance();
+    $dosen = $CI->db->get_where('V_Dosen', array('id_pegawai' => $fields['value']))->row_array();
+    print_r($dosen);
+
+    ?>
+
+    <input type="text" class="form-control mb-2" id="input-<?= $id; ?>" disabled value="<?= $dosen['nama'];  ?>"></input>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php }
+  } elseif ($fields['type'] == 'multi_select_anggota') { ?>
+
+    <?php
+    $CI = &get_instance();
+    $query = $CI->db->query("SELECT value FROM Tr_Field_Value WHERE pengajuan_id =  $id_surat AND field_id = $id")->row_array();
+    $anggota_string = $query['value'];
+    $anggota_array = explode(",", $anggota_string);
+    ?>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" name="dokumen[<?= $id; ?>][]" multiple>
+      <?php
+      if ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) {
+      } else {
+      ?>
+        <?php foreach ($anggota_array as $anggota) { ?>
+          <option value="<?= $anggota; ?>"><?php get_mahasiswa_by_nim($anggota); ?></option>
+        <?php } ?>
+      <?php
+      }
+      ?>
+    </select> -->
+    <table class="table table-striped table-bordered">
+
+      <?php $i = 1;
+      foreach ($anggota_array as $anggota) { ?>
+        <tr>
+          <td><?= $i++ ?> </td>
+          <td><strong><?php get_mahasiswa_by_nim($anggota); ?></strong><br><?= $anggota; ?> </td>
+          <td>Prodi </td>
+        </tr>
+      <?php } ?>
+
+    </table>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+
+      <div class="mt-3"></div>
+
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php } ?>
+  <?php } elseif ($fields['type'] == 'file') {  ?>
+    <?php
+    $image_id = (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];
+
+    $image = $CI->db->select('*')->from('Tr_Media')
+      ->where(array('id' => $image_id))->get()->row_array();
+    if ($image) {
+      $thumb = $image['file'];
+      $image = base_url('public/dist/img/document.png');
+      $exploded = explode("/", $thumb);
+      $file_name = $exploded[2];
+    } else {
+      $image = '';
+      $thumb = '';
+    }
+
+    ?>
+
+    <div class="p-2 mb-2" style="border-radius:5px; <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'border:1px solid red; ' : 'border:1px solid #ddd'; ?>">
+      <p><strong><?= isset($file_name) ? $file_name : ''; ?></strong></p>
+      <a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url($thumb); ?>'><i class='fas fa-eye'></i> Lihat</a>
+    </div>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php } ?>
+  <?php } elseif ($fields['type'] == 'number') { ?>
+    <div class="form-group">
+      <input type="number" class="form-control <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" disabled />
+    </div>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php } ?>
+  <?php } elseif ($fields['type'] == 'date') { ?>
+
+    <input type="text" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> />
+    <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+
+    <div class="mt-2"></div>
+
+    <!-- <script src="https://code.jquery.com/jquery-1.12.4.js"></script> -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+      $(function() {
+        $("#input-<?= $id; ?>").datepicker();
+      });
+    </script>
+
+    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
+      && $CI->session->userdata('role') == 2
+    ) { ?>
+
+      <div class="d-inline">
+        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
+        <label class="switch">
+          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : ''; ?> />
+          <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="d-inline">
+        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
+      </div>
+
+    <?php } ?>
+  <?php } ?>
+
+  <div id="fileZoom" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Preview</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <figure class="img_full"></figure>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Tutup</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    $("a.opener").click(function(event) {
+      var $gbr = $(this).attr('data-href');
+      console.log($gbr);
+      $('.img_full').empty();
+      $('.img_full').prepend("<img style='width:100%;' src=" + $gbr + " />");
+    });
+  </script>
+
+<?php }
 
 
 function get_file_name($file_dir = 0)

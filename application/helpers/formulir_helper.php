@@ -98,10 +98,10 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
     <!-- pad akondisi default (data value kosong), form dNd muncul, listing tidak muncul -->
     <br>
-    <input type="hidden" class="id-dokumen <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') : (($verifikasi == 0) && ($pengajuan_status == 4) ? '' : $field_value);  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
+    <input type="hidden" class="id-dokumen-<?= $id; ?> <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') : (($verifikasi == 0) && ($pengajuan_status == 4) ? '' : $field_value);  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
 
     <div class="tampilUploader">
-      <div id="drag-and-drop-zone" class="dm-uploader p-3 <?= $form; ?> <?= $error; ?>">
+      <div id="drag-and-drop-zone-<?= $id; ?>" class="dm-uploader p-3 <?= $form; ?> <?= $error; ?>">
         <h5 class="mb-2 mt-2 text-muted">Seret &amp; lepaskan berkas di sini</h5>
 
         <div class="btn btn-primary btn-block mb-2">
@@ -113,8 +113,8 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
       <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
       <!-- <span class="<?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? '' : 'd-none'; ?> text-danger"><i class="fas fa-exclamation-triangle"></i> Berkas berikut ini perlu direvisi.</span> -->
 
-      <ul class="list-unstyled p-2 d-flex flex-column col" id="files" style="border:1px solid #ddd; border-radius:4px;">
-        <li class="text-muted text-center empty <?= (validation_errors()) ? (set_value('dokumen[' . $id . ']') ? 'd-none' : 'ga ada value') :  'd-none'  ?>">Belum ada file yang diupload.</li>
+      <ul class="list-unstyled p-2 d-flex flex-column col" id="files-<?= $id; ?>" style="border:1px solid #ddd; border-radius:4px;">
+        <!-- <li class="text-muted text-center empty <?= (validation_errors()) ? (set_value('dokumen[' . $id . ']') ? 'd-none' : 'ga ada value') :  'd-none'  ?>">Belum ada file yang diupload.</li> -->
 
         <li class="media <?= $listing; ?>">
           <div class="media-body mb-1">
@@ -133,7 +133,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
               ?>
               <strong><?= ($file) ? $filename['1'] : ''; ?></strong> <span class="text-muted"></span>
             </p>
-            <div class="buttonedit"> <a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url($file['file']); ?>'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser btn btn-sm btn-danger <?= ($verifikasi == 0 && $pengajuan_status == 5 || $pengajuan_status == 7) ? 'd-none' : ''; ?>' data-id='<?= $file['id']; ?>'> <i class='fas fa-pencil-alt'></i> Ganti</a></div>
+            <div class="buttonedit"> <a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url($file['file']); ?>'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser-<?= $id; ?> btn btn-sm btn-danger <?= ($verifikasi == 0 && $pengajuan_status == 5 || $pengajuan_status == 7) ? 'd-none' : ''; ?>' data-id='<?= $file['id']; ?>'> <i class='fas fa-pencil-alt'></i> Ganti</a></div>
           </div>
         </li>
 
@@ -144,70 +144,11 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
     <script src="<?= base_url() ?>/public/plugins/dm-uploader/dist/js/jquery.dm-uploader.min.js"></script>
     <script>
-      /*
-       * Some helper functions to work with our UI and keep our code cleaner
-       */
-
-      // Adds an entry to our debug area
-      function ui_add_log(message, color) {
-        var d = new Date();
-
-        var dateString = (('0' + d.getHours())).slice(-2) + ':' +
-          (('0' + d.getMinutes())).slice(-2) + ':' +
-          (('0' + d.getSeconds())).slice(-2);
-
-        color = (typeof color === 'undefined' ? 'muted' : color);
-
-        var template = $('#debug-template').text();
-        template = template.replace('%%date%%', dateString);
-        template = template.replace('%%message%%', message);
-        template = template.replace('%%color%%', color);
-
-        $('#debug').find('li.empty').fadeOut(); // remove the 'no messages yet'
-        $('#debug').prepend(template);
-      }
-
-      // Creates a new file and add it to our list
-      function ui_multi_add_file(id, file) {
-        var template = $('#files-template').text();
-
-        console.log(file);
-
-        template = template.replace('%%filename%%', file.name);
-        template = $(template);
-        template.prop('id', 'uploaderFile' + id);
-        template.data('file-id', id);
-
-        $('#files').find('li.empty').hide(); // remove the 'no files yet'
-        $('#files').prepend(template);
-      }
-
       // Changes the status messages on our list
       function ui_multi_update_file_status(id, status, message) {
         $('#uploaderFile' + id).find('span').html(message).prop('class', 'status text-' + status);
       }
 
-      // Updates a file progress, depending on the parameters it may animate it or change the color.
-      function ui_multi_update_file_progress(id, percent, color, active) {
-        color = (typeof color === 'undefined' ? false : color);
-        active = (typeof active === 'undefined' ? true : active);
-
-        var bar = $('#uploaderFile' + id).find('div.progress-bar');
-
-        bar.width(percent + '%').attr('aria-valuenow', percent);
-        bar.toggleClass('progress-bar-striped progress-bar-animated', active);
-
-        if (percent === 0) {
-          bar.html('');
-        } else {
-          bar.html(percent + '%');
-        }
-
-        if (color !== false) {
-          bar.removeClass('bg-success bg-info bg-warning bg-danger');
-          bar.addClass('bg-' + color);
-        }
-      }
       $(function() {
         /*
          * For the sake keeping the code clean and the examples simple this file
@@ -215,7 +156,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
          * 
          * UI functions ui_* can be located in: demo-ui.js
          */
-        $('#drag-and-drop-zone').dmUploader({ //
+        $('#drag-and-drop-zone-<?= $id; ?>').dmUploader({ //
           url: '<?= base_url($fungsi_upload); ?>/doupload',
           maxFileSize: 3000000, // 3 Megs 
           extFilter: ['jpg', 'jpeg', 'png', 'pdf'],
@@ -235,52 +176,48 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
           },
           onNewFile: function(id, file) {
             // When a new file is added using the file selector or the DnD area
-            ui_multi_add_file(id, file);
+            var template = '<li class="media" id="uploaderFile' + id + '"><div class="media-body mb-1"><p class="mb-2"><strong>' + file.name + '</strong> - Status: <span class="text-muted">Waiting</span></p><div class="buttonedit-<?= $id; ?>"></div></div></li>';
+
+            $('#files-<?= $id; ?>').prepend(template);
           },
           onBeforeUpload: function(id) {
             // about tho start uploading a file
             ui_multi_update_file_status(id, 'uploading', '<img width="40px" height="" src="<?= base_url() ?>/public/dist/img/spinners.gif" />');
-            ui_multi_update_file_progress(id, 0, '', true);
           },
           onUploadCanceled: function(id) {
             // Happens when a file is directly canceled by the user.
             ui_multi_update_file_status(id, 'warning', 'Canceled by User');
-            ui_multi_update_file_progress(id, 0, 'warning', false);
+
           },
-          onUploadProgress: function(id, percent) {
-            // Updating file progress
-            ui_multi_update_file_progress(id, percent);
-          },
+          onUploadProgress: function(id, percent) {},
           onUploadSuccess: function(id, data) {
             // A file was successfully uploaded
             ui_multi_update_file_status(id, 'success', '<i class="fas fa-check-circle"></i>');
-            ui_multi_update_file_progress(id, 100, 'success', false);
 
             var response = JSON.stringify(data);
             var obj = JSON.parse(response);
 
-            $('.id-dokumen').val(obj.id);
-            $('#drag-and-drop-zone').fadeOut('400');
+            $('.id-dokumen-<?= $id; ?>').val(obj.id);
+            $('#drag-and-drop-zone-<?= $id; ?>').fadeOut('400');
             $('.deleteUser').removeClass('d-none', '3000');
-            var button = "<a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url(); ?>" + obj.orig + "'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser btn btn-sm btn-danger' data-id='" + obj.id + "'> <i class='fas fa-pencil-alt'></i> Ganti</a>";
-            $('.buttonedit').prepend(button);
+            var button = "<a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url(); ?>" + obj.orig + "'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser-<?= $id; ?> btn btn-sm btn-danger' data-id='" + obj.id + "'> <i class='fas fa-pencil-alt'></i> Ganti</a>";
+            $('.buttonedit-<?= $id; ?>').prepend(button);
 
           },
           onUploadError: function(id, xhr, status, message) {
             ui_multi_update_file_status(id, 'danger', message);
-            ui_multi_update_file_progress(id, 0, 'danger', false);
           },
           onFileExtError: function(id, file) {
-            $('#files').find('li.empty').html('<i class="fas fa-exclamation-triangle"></i> File tidak didukung').removeClass('text-muted').addClass('text-danger');
+            $('#files-<?= $id; ?>').find('li.empty').html('<i class="fas fa-exclamation-triangle"></i> File tidak didukung').removeClass('text-muted').addClass('text-danger');
           },
           onFileSizeError: function(id, file) {
 
-            $('#files').find('li.empty').html('<i class="fas fa-exclamation-triangle"></i> File terlalu besar').removeClass('text-muted').addClass('text-danger');
+            $('#files-<?= $id; ?>').find('li.empty').html('<i class="fas fa-exclamation-triangle"></i> File terlalu besar').removeClass('text-muted').addClass('text-danger');
 
           }
         });
       });
-      $('body').on('click', 'a.deleteUser', function(e) {
+      $('body').on('click', 'a.deleteUser-<?= $id; ?>', function(e) {
         e.preventDefault();
         var href = $(this).attr("href");
         var ele = $(this).parents('.media');
@@ -297,11 +234,11 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
             var dataResult = JSON.parse(dataResult);
             if (dataResult.statusCode == 200) {
               ele.fadeOut().remove();
-              $('#files').find('div.empty').fadeIn();
-              $('#drag-and-drop-zone').fadeIn('400');
-              $('#drag-and-drop-zone').removeClass('d-none');
-              $('#files').find('li.empty').show();
-              $('.id-dokumen').val('');
+              $('#files-<?= $id; ?>').find('div.empty').fadeIn();
+              $('#drag-and-drop-zone-<?= $id; ?>').fadeIn('400');
+              $('#drag-and-drop-zone-<?= $id; ?>').removeClass('d-none');
+              $('#files-<?= $id; ?>').find('li.empty').show();
+              $('.id-dokumen-<?= $id; ?>').val('');
             }
           }
         });
@@ -311,7 +248,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
 
     <!-- File item template -->
-    <script type="text/html" id="files-template">
+    <script type="text/html" id="files-template-<?= $id; ?>">
       <li class="media">
         <div class="media-body mb-1">
           <p class="mb-2">
@@ -368,7 +305,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
   <?php } elseif ($fields['type'] == 'select_pembimbing') {  ?>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-    <select type="text" class="<?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?>></select>
+    <select class="<?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]"></select>
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
@@ -400,9 +337,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
       });
     </script>
   <?php } elseif ($fields['type'] == 'ta') { ?>
-    <select class="form-control
-<?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> 
-<?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
+    <select class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
       <option value=""> -- Pilih Tahun Akademik -- </option>
       <?php
       $cur_year = date("Y");
@@ -442,6 +377,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
     <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" name="dokumen[<?= $id; ?>][]" multiple>
+      <option value="">Pilih</option>
       <?php
       if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 3 && $verifikasi == 0) {
       } else {
@@ -498,8 +434,6 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
       });
     </script>
 
-
-
   <?php
   } // endif file 
 }
@@ -520,34 +454,7 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
     ->where(array('fv.pengajuan_id' => $id_surat))
     ->get()->row_array();
 
-  if ($fields['type'] == 'image') {
-    $image = $CI->db->select('*')->from('Tr_Media')
-      ->where(array('id' => $fields['value']))->get()->row_array();
-    $img_full = $image['file'];
-    $thumb = $image['thumb'];
-    $image = base_url($thumb);
-  ?>
-    <figure style="background:url('<?= $image; ?>') center center no-repeat" class="d-flex align-items-start justify-content-start preview-dokumen">
-      <a data-href="<?= base_url($img_full); ?>" class="opener btn btn-warning btn-md" type="button" data-toggle="modal" data-target="#fileZoom"><i class="fas fa-search-plus" data-toggle="tooltip" data-placement="top" title="Klik untuk memperbesar"></i></a>
-    </figure>
-
-    <?php if ((($pengajuan_status == 2 && $fields['verifikasi'] == 0) || ($pengajuan_status == 5 && $fields['verifikasi'] == 0))
-
-      && ($CI->session->userdata('role') == 2)
-
-    ) { ?>
-      <div class="d-inline">
-        <input type="hidden" name="verifikasi[<?= $id; ?>]" value="0" />
-        <label class="switch">
-          <input type="checkbox" class="verifikasi" name="verifikasi[<?= $id; ?>]" value="1" <?= ($fields['verifikasi'] == 1) ? 'checked' : '';  ?> />
-          <span class="slider round"></span>
-        </label>
-      </div>
-      <div class="d-inline">
-        Data sudah sesuai? <a class="help" data-toggle="tooltip" data-placement="right" title="Klik tombol di samping jika data sudah sesuai"><i class="fa fa-info-circle"></i></a>
-      </div>
-    <?php }
-  } elseif ($fields['type'] == 'textarea') { ?>
+  if ($fields['type'] == 'textarea') { ?>
 
     <textarea class="form-control mb-2" id="input-<?= $id; ?>" disabled><?= $fields['value'];  ?></textarea>
 

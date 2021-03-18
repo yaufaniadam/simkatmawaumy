@@ -276,16 +276,22 @@ class Pengajuan extends Mahasiswa_Controller
 			//echo $id_status;
 
 			$data_user = $this->session->userdata('user_id');
-			foreach ($this->input->post('dokumen') as $id => $dokumen) {
+
+			// echo '<pre>';
+			// print_r($this->input->post('dokumen'));
+			// echo '</pre>';
+
+			foreach ($pengajuan_fields as $pengajuan_field) {
 				$this->form_validation->set_rules(
-					'dokumen[' . $id . ']',
-					$this->getNamaField($id),
+					'dokumen[' . $pengajuan_field['field_id'] . ']',
+					$this->getNamaField($pengajuan_field['field_id']),
 					'trim|required',
 					[
 						'required' => '%s wajib diisi',
 					]
 				);
 			}
+
 
 			if ($this->form_validation->run() == false) {
 				$data['pengajuan_fields'] = $pengajuan_fields;
@@ -535,6 +541,16 @@ class Pengajuan extends Mahasiswa_Controller
 
 		if (!$this->image_lib->resize()) { //Resize image
 			redirect("errorhandler"); //If error, redirect to an error page
+		}
+	}
+
+	function anggota_check($str)
+	{
+		if (is_array($str)) {
+			$this->form_validation->set_message('Anggota', 'The {field} field can not be the word "test"');
+			return true;
+		} else {
+			return false;
 		}
 	}
 

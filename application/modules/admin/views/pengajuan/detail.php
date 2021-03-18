@@ -41,49 +41,6 @@ mestinya ketika user mengganti, error messagenya langsung ilang -->
 
 		<!-- Surat diverifikasi oleh staf-->
 		<?php if (($pengajuan['status_id'] == 7) && $this->session->userdata('role') == 2) { ?>
-
-			<div class="card shadow mb-3">
-				<a href="#collPengantar" class="d-block card-header pt-3 pb-2 bg-tosca" data-toggle="collapse" role="button" aria-expanded="true" aria-controls="collPengantar">
-					<p class="h6 font-weight-bold text-white">Pencairan Dana</p>
-				</a>
-				<div class="collapse show" id="collPengantar">
-					<div class="card-body">
-						<!-- <p class="font-italic">Assalamu'alaikum warahmatullahi wabarakatuh</p> -->
-						<p> Assalamualaikum, </p>
-						<p> Mohon diproses pencairan dana untuk mahasiswa berikut ini: </p>
-
-						<table class="mb-3 ml-3 table-striped" style="width:95%">
-							<tr>
-								<td style="width:150px;">Nama</td>
-								<td> : <?= $pengajuan['FULLNAME']; ?></td>
-							</tr>
-							<tr>
-								<td>NIM</td>
-								<td> : <?= $pengajuan['nim']; ?></td>
-							</tr>
-							<tr>
-								<td>Program Studi</td>
-								<td> : <?= $pengajuan['NAME_OF_DEPARTMENT']; ?></td>
-							</tr>
-							<tr>
-								<td>Jenis Surat</td>
-								<td> : <?= $pengajuan['Jenis_Pengajuan']; ?></td>
-							</tr>
-						</table>
-
-						<?php if ($pengajuan['status_id'] == 7 && $this->session->userdata('role') == 2) { ?>
-							<div class="form-row pt-3">
-								<div class="col-md-12">
-									<input type="submit" id="sub1" value="Klik jika sudah dicairkan" name="submit" class="btn btn-perak btn-md btn-block">
-								</div>
-							</div>
-						<?php } ?>
-
-
-					</div>
-				</div>
-			</div>
-
 		<?php } ?>
 
 		<div class="card shadow">

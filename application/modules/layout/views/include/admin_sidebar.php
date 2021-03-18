@@ -26,7 +26,12 @@
 		</a>
 	</li>
 
-
+	<li class="nav-item" id="semua_pengajuan">
+		<a class="nav-link" href="<?= base_url("admin/periode/index/"); ?>">
+			<i class="fas fa-fw fa-envelope"></i>
+			<span>Periode</span>
+		</a>
+	</li>
 
 	<li class="nav-item" id="semua_pengajuan">
 		<a class="nav-link" href="<?= base_url("admin/pengajuan/arsip/0/0") ?>">
@@ -34,6 +39,8 @@
 			<span>Arsip Pengajuan</span>
 		</a>
 	</li>
+
+
 
 	<?php if ($this->session->userdata('role') == 1) { ?>
 

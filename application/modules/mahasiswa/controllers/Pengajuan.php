@@ -273,13 +273,11 @@ class Pengajuan extends Mahasiswa_Controller
 				$next_status = 5;
 			}
 
-			//echo $id_status;
-
 			$data_user = $this->session->userdata('user_id');
-			foreach ($this->input->post('dokumen') as $id => $dokumen) {
+			foreach ($pengajuan_fields as $pengajuan_field) {
 				$this->form_validation->set_rules(
-					'dokumen[' . $id . ']',
-					$this->getNamaField($id),
+					'dokumen[' . $pengajuan_field['field_id'] . ']',
+					$this->getNamaField($pengajuan_field['field_id']),
 					'trim|required',
 					[
 						'required' => '%s wajib diisi',
@@ -324,7 +322,6 @@ class Pengajuan extends Mahasiswa_Controller
 						);
 					}
 				}
-
 				redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 			}
 		} else {

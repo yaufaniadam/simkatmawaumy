@@ -264,70 +264,74 @@ class Pengajuan extends Mahasiswa_Controller
 		$data['title'] =  $pengajuan->jenis_pengajuan;
 
 		if ($this->input->post("submit")) {
-
 			$id_status =	$this->input->post('status');
-
 			if ($id_status == 1) {
 				$next_status = 2;
 			} elseif ($id_status == 4) {
 				$next_status = 5;
 			}
-
 			$data_user = $this->session->userdata('user_id');
-			foreach ($pengajuan_fields as $pengajuan_field) {
-				$this->form_validation->set_rules(
-					'dokumen[' . $pengajuan_field['field_id'] . ']',
-					$this->getNamaField($pengajuan_field['field_id']),
-					'trim|required',
-					[
-						'required' => '%s wajib diisi',
-					]
-				);
+
+			// echo '<pre>';
+			// print_r($this->input->post('dokumen'));
+			// echo '</pre>';
+
+			// foreach ($pengajuan_fields as $pengajuan_field) {
+			// 	$this->form_validation->set_rules(
+			// 		'dokumen[' . $pengajuan_field['field_id'] . ']',
+			// 		$this->getNamaField($pengajuan_field['field_id']),
+			// 		'trim|required',
+			// 		[
+			// 			'required' => '%s wajib diisi',
+			// 		]
+			// 	);
+			// }
+
+			// if ($this->form_validation->run() == false) {
+			// 	$data['pengajuan_fields'] = $pengajuan_fields;
+			// 	$data['pengajuan_status'] = $pengajuan->status_id;
+			// 	$data['pengajuan_id'] = $pengajuan->pengajuan_id;
+			// 	$data['title'] =  $pengajuan->jenis_pengajuan;
+			// 	$data['view'] = 'pengajuan/tambah';
+			// 	$this->load->view('layout/layout', $data);
+			// } else {
+			if ($id_status == 1 || $id_status == 4) {
+				$insert = $this->db->set('pengajuan_id', $pengajuan_id)
+					->set('status_id', $next_status)
+					->set('pic', $data_user['STUDENTID'])
+					->set('date', date('Y-m-d h:m:s'))
+					->insert('Tr_Pengajuan_Status');
 			}
-
-			if ($this->form_validation->run() == false) {
-				$data['pengajuan_fields'] = $pengajuan_fields;
-				$data['pengajuan_status'] = $pengajuan->status_id;
-				$data['pengajuan_id'] = $pengajuan->pengajuan_id;
-				$data['title'] =  $pengajuan->jenis_pengajuan;
-				$data['view'] = 'pengajuan/tambah';
-				$this->load->view('layout/layout', $data);
-			} else {
-
-				if ($id_status == 1 || $id_status == 4) {
-					$insert = $this->db->set('pengajuan_id', $pengajuan_id)
-						->set('status_id', $next_status)
-						->set('pic', $data_user['STUDENTID'])
-						->set('date', date('Y-m-d h:m:s'))
-						->insert('Tr_Pengajuan_Status');
-				}
-
-				foreach ($this->input->post('dokumen') as $id => $dokumen) {
-					if (is_array($dokumen)) {
-						$anggota = implode(",", $dokumen);
-						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-						$this->db->update(
-							'Tr_Field_Value',
-							array(
-								'value' => $anggota
-							)
-						);
-					} else {
-						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-						$this->db->update(
-							'Tr_Field_Value',
-							array(
-								'value' => $dokumen
-							)
-						);
-					}
-				}
-				redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
+			foreach ($this->input->post('dokumen') as $id => $dokumen) {
+				// if (is_array($dokumen)) {
+				// 	$anggota = implode(",", $dokumen);
+				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+				// 	$this->db->update(
+				// 		'Tr_Field_Value',
+				// 		array(
+				// 			'value' => $anggota
+				// 		)
+				// 	);
+				// } else {
+				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+				// 	$this->db->update(
+				// 		'Tr_Field_Value',
+				// 		array(
+				// 			'value' => $dokumen
+				// 		)
+				// 	);
+				// }
 			}
-		} else {
-			$data['view'] = 'pengajuan/tambah';
-			$this->load->view('layout/layout', $data);
+			echo "<pre>";
+			print_r($this->input->post('dokumen'));
+			echo "</pre>";
+			die();
+			redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 		}
+		// } else {
+		$data['view'] = 'pengajuan/tambah';
+		$this->load->view('layout/layout', $data);
+		// }
 	}
 
 	public function doupload()
@@ -405,21 +409,6 @@ class Pengajuan extends Mahasiswa_Controller
 					'filename' => $data['file_name']
 				]
 			);
-
-
-			// $this->_create_thumbs($data['file_name']);
-
-			// // $result = 
-			// $this->db->insert(
-			// 	'Tr_Media',
-			// 	array(
-			// 		'nim' => $this->session->userdata('studentid'),
-			// 		'file' =>  $upload_path . '/' . $data['file_name'],
-			// 		'thumb' =>  $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext']
-			// 	)
-			// );
-
-
 		}
 	}
 
@@ -532,6 +521,16 @@ class Pengajuan extends Mahasiswa_Controller
 
 		if (!$this->image_lib->resize()) { //Resize image
 			redirect("errorhandler"); //If error, redirect to an error page
+		}
+	}
+
+	function anggota_check($str)
+	{
+		if (is_array($str)) {
+			$this->form_validation->set_message('Anggota', 'The {field} field can not be the word "test"');
+			return true;
+		} else {
+			return false;
 		}
 	}
 

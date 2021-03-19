@@ -368,7 +368,8 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 	<?php } elseif ($fields['type'] == 'select_pembimbing') {  ?>
 		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-		<select type="text" class="<?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?>></select>
+		<select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" name="dokumen[<?= $id; ?>]">
+		</select>
 		<span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
@@ -400,9 +401,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 			});
 		</script>
 	<?php } elseif ($fields['type'] == 'ta') { ?>
-		<select class="form-control
-<?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> 
-<?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
+		<select class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
 			<option value=""> -- Pilih Tahun Akademik -- </option>
 			<?php
 			$cur_year = date("Y");
@@ -678,15 +677,15 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
 
 		<!-- <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" name="dokumen[<?= $id; ?>][]" multiple>
       <?php
-			if ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) {
-			} else {
-			?>
+		if ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) {
+		} else {
+		?>
         <?php foreach ($anggota_array as $anggota) { ?>
           <option value="<?= $anggota; ?>"><?php get_mahasiswa_by_nim($anggota); ?></option>
         <?php } ?>
       <?php
-			}
-			?>
+		}
+		?>
     </select> -->
 		<table class="table table-striped table-bordered">
 

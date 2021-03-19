@@ -277,10 +277,6 @@ class Pengajuan extends Mahasiswa_Controller
 
 			$data_user = $this->session->userdata('user_id');
 
-			// echo '<pre>';
-			// print_r($this->input->post('dokumen'));
-			// echo '</pre>';
-
 			foreach ($pengajuan_fields as $pengajuan_field) {
 				$this->form_validation->set_rules(
 					'dokumen[' . $pengajuan_field['field_id'] . ']',

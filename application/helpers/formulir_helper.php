@@ -68,7 +68,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
         $error = '';
       } else {
         // error di field ini
-        $form = 'd-block';
+        $form = '';
         $listing = 'd-none';
         $error = 'is-invalid';
       }
@@ -78,7 +78,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
         //field sudah dicek, tapi perlu direvisi
         if ($verifikasi == 0 && $pengajuan_status == 4) {
           //field memiliki isi
-          $form = 'd-block';
+          $form = '';
           $listing = 'd-none';
           $error = 'is-invalid';
         } else {
@@ -88,7 +88,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
         }
       } else {
         //field kosong
-        $form = 'd-block';
+        $form = '';
         $listing = 'd-none';
         $error = '';
       }
@@ -247,19 +247,6 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     </script>
 
 
-    <!-- File item template -->
-    <script type="text/html" id="files-template-<?= $id; ?>">
-      <li class="media">
-        <div class="media-body mb-1">
-          <p class="mb-2">
-            <strong>%%filename%%</strong> - Status: <span class="text-muted">Waiting</span>
-          </p>
-
-          <div class="buttonedit"></div>
-        </div>
-      </li>
-    </script>
-
   <?php } elseif ($fields['type'] == 'text') {  ?>
 
     <input type="text" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
@@ -302,40 +289,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
     <!--  Piih Pembimbing -->
-  <?php } elseif ($fields['type'] == 'select_pembimbing') {  ?>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
-    <select class="<?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]"></select>
-    <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
-
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-    <script>
-      $(document).ready(function() {
-        $('.<?= $fields['key']; ?>').select2({
-          ajax: {
-            url: '<?= base_url('mahasiswa/pengajuan/getpembimbing'); ?>',
-            dataType: 'json',
-            type: 'post',
-            delay: 250,
-            data: function(params) {
-              return {
-                search: params.term,
-              }
-            },
-            processResults: function(data) {
-              return {
-                results: data
-              };
-            },
-            cache: true
-          },
-          placeholder: 'Pilih Dosen Pembimbing',
-          minimumInputLength: 3,
-          // templateResult: formatRepo,
-          // templateSelection: formatRepoSelection
-        });
-      });
-    </script>
   <?php } elseif ($fields['type'] == 'ta') { ?>
     <select class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>]" id="input-<?= $id; ?>">
       <option value=""> -- Pilih Tahun Akademik -- </option>
@@ -365,14 +319,56 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
   <?php } elseif ($fields['type'] == 'number') { ?>
     <input type="number" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
-
   <?php } elseif ($fields['type'] == 'multi_select_anggota') { ?>
-    <?php
+  <?php } elseif ($fields['type'] == 'multi_select_anggotas') {
+
+    if (validation_errors()) { // cek adakah eror validasi
+      // kondisional di bawah untuk memeriksa, erornya pada field ini ataukah pada field lain
+      if (set_value('dokumen[' . $id . ']')) {
+        // error di field lain       
+        $form = 'd-none';
+        $listing = 'd-block';
+        $error = '';
+      } else {
+        // error di field ini
+        $form = '';
+        $listing = 'd-none';
+        $error = 'is-invalid';
+      }
+    } else {
+      //tampilan default, saat value field 0, atau field sudah ada isinya dan menunggu verifikasi
+      if ($field_value) {
+        //field sudah dicek, tapi perlu direvisi
+        if ($verifikasi == 0 && $pengajuan_status == 4) {
+          //field memiliki isi
+          $form = '';
+          $listing = 'd-none';
+          $error = 'is-invalid';
+        } else {
+          $form = 'd-none';
+          $listing = 'd-block';
+          $error = '';
+        }
+      } else {
+        //field kosong
+        $form = '';
+        $listing = 'd-none';
+        $error = '';
+      }
+    }
+
+
+    echo '<h1>Form' . $form . '</h1><br>';
+
+    echo '<p>listing' . $listing . '</p><br>';
+    echo '<em>error ' . $error . '</em><br>';
+
+
     $CI = &get_instance();
     $query = $CI->db->query("SELECT value FROM Tr_Field_Value WHERE pengajuan_id = $pengajuan_id AND field_id = $id")->row_array();
     $anggota_string = $query['value'];
     $anggota_array = explode(",", $anggota_string);
-    ?>
+  ?>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
@@ -435,6 +431,55 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     </script>
 
   <?php
+  } elseif ($fields['type'] == 'select_pembimbing') {
+
+  ?>
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+
+
+    <select class="ambil-pembimbing form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> name="dokumen[<?= $id; ?>][]">
+
+
+    </select>
+    <?= set_value('dokumen[' . $id . ']'); ?>
+
+    <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+    <script>
+      $(document).ready(function() {
+
+        var selectedValuesTest = ['2241']
+
+        $('.ambil-pembimbing').select2({
+          ajax: {
+            url: '<?= base_url('mahasiswa/pengajuan/getpembimbing'); ?>',
+            dataType: 'json',
+            type: 'post',
+            delay: 250,
+            data: function(params) {
+              return {
+                search: params.term,
+              }
+            },
+            processResults: function(data) {
+              return {
+                results: data
+              };
+            },
+            cache: true
+          },
+          placeholder: 'Pilih Dosen',
+          minimumInputLength: 3,
+
+        });
+        $('.ambil-pembimbing').val(selectedValuesTest).trigger('change');
+      });
+    </script>
+
+  <?php
+
   } // endif file 
 }
 

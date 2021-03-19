@@ -272,6 +272,7 @@ class Pengajuan extends Mahasiswa_Controller
 			}
 			$data_user = $this->session->userdata('user_id');
 
+<<<<<<< HEAD
 			// echo '<pre>';
 			// print_r($this->input->post('dokumen'));
 			// echo '</pre>';
@@ -301,6 +302,17 @@ class Pengajuan extends Mahasiswa_Controller
 					->set('pic', $data_user['STUDENTID'])
 					->set('date', date('Y-m-d h:m:s'))
 					->insert('Tr_Pengajuan_Status');
+=======
+			foreach ($pengajuan_fields as $pengajuan_field) {
+				$this->form_validation->set_rules(
+					'dokumen[' . $pengajuan_field['field_id'] . ']',
+					$this->getNamaField($pengajuan_field['field_id']),
+					'trim|required',
+					[
+						'required' => '%s wajib diisi',
+					]
+				);
+>>>>>>> lpka/editan_adam
 			}
 			foreach ($this->input->post('dokumen') as $id => $dokumen) {
 				// if (is_array($dokumen)) {

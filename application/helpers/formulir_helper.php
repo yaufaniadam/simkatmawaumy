@@ -10,7 +10,19 @@ function get_mahasiswa_by_nim($nim)
 {
   $CI = &get_instance();
   $query = $CI->db->get_where('V_Mahasiswa', array('STUDENTID' => $nim))->row_array();
-  echo $query['FULLNAME'];
+  return $query;
+}
+function get_dosen_by_id($id)
+{
+  $CI = &get_instance();
+  $query = $CI->db->get_where('V_Dosen', array('id_pegawai' => $id))->row_array();
+  return $query;
+}
+function get_prodi_by_id($id)
+{
+  $CI = &get_instance();
+  $query = $CI->db->get_where('Mstr_Department', array('DEPARTMENT_ID' => $id))->row_array();
+  return $query;
 }
 
 //menampilkan kategori keterangan surat
@@ -249,7 +261,9 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
   <?php } elseif ($fields['type'] == 'text') {  ?>
 
-    <input type="text" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
+    <fieldset>
+      <input type="text" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" />
+    </fieldset>
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
   <?php } elseif ($fields['type'] == 'textarea') {  ?>
@@ -264,7 +278,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     <script type="text/javascript" src="<?= base_url() ?>/public/plugins/daterangepicker/daterangepicker.js"></script>
     <link rel="stylesheet" type="text/css" href="<?= base_url() ?>/public/plugins/daterangepicker/daterangepicker.css" />
 
-    <input type="text" class="form-control" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
+    <input type="text" class="form-control" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" />
 
     <script type="text/javascript">
       $(function() {
@@ -319,90 +333,57 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
   <?php } elseif ($fields['type'] == 'number') { ?>
     <input type="number" class="form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" id="input-<?= $id; ?>" name="dokumen[<?= $id; ?>]" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> />
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
-  <?php } elseif ($fields['type'] == 'multi_select_anggota') { ?>
-  <?php } elseif ($fields['type'] == 'multi_select_anggotas') {
+
+  <?php } elseif ($fields['type'] == 'multi_select_anggota') {
 
     if (validation_errors()) { // cek adakah eror validasi
       // kondisional di bawah untuk memeriksa, erornya pada field ini ataukah pada field lain
-      if (set_value('dokumen[' . $id . ']')) {
-        // error di field lain       
-        $form = 'd-none';
-        $listing = 'd-block';
-        $error = '';
-      } else {
-        // error di field ini
-        $form = '';
-        $listing = 'd-none';
-        $error = 'is-invalid';
-      }
+      $value = set_value('dokumen[' . $id . '][]');
     } else {
       //tampilan default, saat value field 0, atau field sudah ada isinya dan menunggu verifikasi
+
       if ($field_value) {
         //field sudah dicek, tapi perlu direvisi
         if ($verifikasi == 0 && $pengajuan_status == 4) {
-          //field memiliki isi
-          $form = '';
-          $listing = 'd-none';
-          $error = 'is-invalid';
+          $value = explode(',', $field_value);
         } else {
-          $form = 'd-none';
-          $listing = 'd-block';
-          $error = '';
+          $value = explode(',', $field_value);
         }
       } else {
         //field kosong
-        $form = '';
-        $listing = 'd-none';
-        $error = '';
+        $value = '';
       }
     }
 
-
-    echo '<h1>Form' . $form . '</h1><br>';
-
-    echo '<p>listing' . $listing . '</p><br>';
-    echo '<em>error ' . $error . '</em><br>';
-
-
-    $CI = &get_instance();
-    $query = $CI->db->query("SELECT value FROM Tr_Field_Value WHERE pengajuan_id = $pengajuan_id AND field_id = $id")->row_array();
-    $anggota_string = $query['value'];
-    $anggota_array = explode(",", $anggota_string);
   ?>
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+    <?php print_r(set_select('dokumen[' . $id . ']')); ?>
+    <fieldset>
+      <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>][]" multiple>
+        <?php if ($value) {
+          foreach ($value as $anggota) { ?>
+            <option value="<?= $anggota; ?>"><?php echo get_mahasiswa_by_nim($anggota)['FULLNAME']; ?></option>
+        <?php }
+        } ?>
 
-    <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $field_value;  ?>" name="dokumen[<?= $id; ?>][]" multiple>
-      <option value="">Pilih</option>
-      <?php
-      if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 3 && $verifikasi == 0) {
-      } else {
-      ?>
-        <?php foreach ($anggota_array as $anggota) { ?>
-          <option value="<?= $anggota; ?>"><?php get_mahasiswa_by_nim($anggota); ?></option>
-        <?php } ?>
-      <?php
-      }
-      ?>
-    </select>
+      </select>
+    </fieldset>
 
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <script>
       $(document).ready(function() {
-        <?php
-        if ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 3 && $verifikasi == 0) {
-        } else {
-        ?>
-          var selectedValuesTest = [
-            <?php foreach ($anggota_array as $anggota) {
+
+        var selectedValuesTest = [
+          <?php if ($value) {
+            foreach ($value as $anggota) {
               echo '"' . $anggota . '"' . ',';
-            } ?>
-          ];
-        <?php
-        }
-        ?>
+            }
+          } ?>
+        ];
+
         $('.js-data-example-ajax').select2({
           ajax: {
             url: '<?= base_url('mahasiswa/pengajuan/getanggota'); ?>',
@@ -433,16 +414,35 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
   <?php
   } elseif ($fields['type'] == 'select_pembimbing') {
 
-  ?>
 
+    if (validation_errors()) { // cek adakah eror validasi
+      // kondisional di bawah untuk memeriksa, erornya pada field ini ataukah pada field lain
+      $value = set_value('dokumen[' . $id . ']');
+    } else {
+      //tampilan default, saat value field 0, atau field sudah ada isinya dan menunggu verifikasi
+
+      if ($field_value) {
+        //field sudah dicek, tapi perlu direvisi
+        if ($verifikasi == 0 && $pengajuan_status == 4) {
+          $value = $field_value;
+        } else {
+          $value = $field_value;
+        }
+      } else {
+        //field kosong
+        $value = '';
+      }
+    }
+
+  ?>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 
+    <fieldset <?= ($pengajuan_status == 1 && $verifikasi == 0 || $pengajuan_status == 2 && $verifikasi == 0 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?>>
+      <select class="ambil-pembimbing form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" name="dokumen[<?= $id; ?>][]">
+        <option value="<?= $value; ?>"><?= get_dosen_by_id($value)['nama']; ?></option>
 
-    <select class="ambil-pembimbing form-control form-control-lg <?= $fields['key']; ?> form-control <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($verifikasi == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 || $pengajuan_status == 2 || $pengajuan_status == 4 && $verifikasi == 0) ? "" : "disabled"; ?> name="dokumen[<?= $id; ?>][]">
-
-
-    </select>
-    <?= set_value('dokumen[' . $id . ']'); ?>
+      </select>
+    </fieldset>
 
     <span class="text-danger"><?php echo form_error('dokumen[' . $id . ']'); ?></span>
 
@@ -450,7 +450,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     <script>
       $(document).ready(function() {
 
-        var selectedValuesTest = ['2241']
+        var selectedValuesTest = ['<?= $value; ?>']
 
         $('.ambil-pembimbing').select2({
           ajax: {
@@ -598,7 +598,6 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
   } elseif ($fields['type'] == 'select_pembimbing') {
     $CI = &get_instance();
     $dosen = $CI->db->get_where('V_Dosen', array('id_pegawai' => $fields['value']))->row_array();
-    print_r($dosen);
 
     ?>
 
@@ -648,8 +647,8 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
       foreach ($anggota_array as $anggota) { ?>
         <tr>
           <td><?= $i++ ?> </td>
-          <td><strong><?php get_mahasiswa_by_nim($anggota); ?></strong><br><?= $anggota; ?> </td>
-          <td>Prodi </td>
+          <td><strong><?php echo get_mahasiswa_by_nim($anggota)['FULLNAME']; ?></strong><br><?= $anggota; ?> </td>
+          <td><?php echo get_prodi_by_id(get_mahasiswa_by_nim($anggota)['DEPARTMENT_ID'])['NAME_OF_DEPARTMENT']; ?> </td>
         </tr>
       <?php } ?>
 

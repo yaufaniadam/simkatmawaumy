@@ -1,3 +1,7 @@
+<!-- CSS & JS -->
+
+<?php call_styles(); ?>
+
 <h1 class="h3 mb-4 text-gray-900"><?php /*echo $surat['kategori_surat'];*/ ?> </h1>
 
 <div class="row">
@@ -37,7 +41,7 @@
 						<input type="hidden" name="status" value="4">
 						<input class="btn btn-lg btn-<?= $pengajuan->badge; ?> btn-block" type="submit" name="submit" value="<?= ($pengajuan->status_id == '4') ? " Kirim Revisi Data" : "Ajukan Surat " . $pengajuan->Jenis_Pengajuan; ?>" />
 
-					<?php } elseif ($pengajuan->status_id == 1 || $pengajuan->status_id == 2) { ?>
+					<?php } elseif ($pengajuan->status_id == 1) { ?>
 						<input type="hidden" name="status" value="<?= ($pengajuan->status_id == 1) ? '1' : '2' ?>">
 						<input class="btn btn-lg btn-<?= $pengajuan->badge; ?> btn-block" type="submit" name="submit" value="<?= ($pengajuan->status_id == 1) ? 'Ajukan Prestasi' : 'Simpan perubahan' ?> " />
 					<?php } ?>
@@ -103,4 +107,4 @@
 	<!-- /.col -->
 </div>
 
-<?php fileUploaderModal(); ?>
+<?php call_scripts(); ?>

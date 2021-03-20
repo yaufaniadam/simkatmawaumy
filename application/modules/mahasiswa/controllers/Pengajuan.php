@@ -272,37 +272,6 @@ class Pengajuan extends Mahasiswa_Controller
 			}
 			$data_user = $this->session->userdata('user_id');
 
-<<<<<<< HEAD
-			// echo '<pre>';
-			// print_r($this->input->post('dokumen'));
-			// echo '</pre>';
-
-			// foreach ($pengajuan_fields as $pengajuan_field) {
-			// 	$this->form_validation->set_rules(
-			// 		'dokumen[' . $pengajuan_field['field_id'] . ']',
-			// 		$this->getNamaField($pengajuan_field['field_id']),
-			// 		'trim|required',
-			// 		[
-			// 			'required' => '%s wajib diisi',
-			// 		]
-			// 	);
-			// }
-
-			// if ($this->form_validation->run() == false) {
-			// 	$data['pengajuan_fields'] = $pengajuan_fields;
-			// 	$data['pengajuan_status'] = $pengajuan->status_id;
-			// 	$data['pengajuan_id'] = $pengajuan->pengajuan_id;
-			// 	$data['title'] =  $pengajuan->jenis_pengajuan;
-			// 	$data['view'] = 'pengajuan/tambah';
-			// 	$this->load->view('layout/layout', $data);
-			// } else {
-			if ($id_status == 1 || $id_status == 4) {
-				$insert = $this->db->set('pengajuan_id', $pengajuan_id)
-					->set('status_id', $next_status)
-					->set('pic', $data_user['STUDENTID'])
-					->set('date', date('Y-m-d h:m:s'))
-					->insert('Tr_Pengajuan_Status');
-=======
 			foreach ($pengajuan_fields as $pengajuan_field) {
 				$this->form_validation->set_rules(
 					'dokumen[' . $pengajuan_field['field_id'] . ']',
@@ -312,33 +281,41 @@ class Pengajuan extends Mahasiswa_Controller
 						'required' => '%s wajib diisi',
 					]
 				);
->>>>>>> lpka/editan_adam
 			}
-			foreach ($this->input->post('dokumen') as $id => $dokumen) {
-				// if (is_array($dokumen)) {
-				// 	$anggota = implode(",", $dokumen);
-				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-				// 	$this->db->update(
-				// 		'Tr_Field_Value',
-				// 		array(
-				// 			'value' => $anggota
-				// 		)
-				// 	);
-				// } else {
-				// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-				// 	$this->db->update(
-				// 		'Tr_Field_Value',
-				// 		array(
-				// 			'value' => $dokumen
-				// 		)
-				// 	);
-				// }
+
+			if ($this->form_validation->run() == false) {
+				$data['pengajuan_fields'] = $pengajuan_fields;
+				$data['pengajuan_status'] = $pengajuan->status_id;
+				$data['pengajuan_id'] = $pengajuan->pengajuan_id;
+				$data['title'] =  $pengajuan->jenis_pengajuan;
+			} else {
+
+				foreach ($this->input->post('dokumen') as $id => $dokumen) {
+					// if (is_array($dokumen)) {
+					// 	$anggota = implode(",", $dokumen);
+					// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+					// 	$this->db->update(
+					// 		'Tr_Field_Value',
+					// 		array(
+					// 			'value' => $anggota
+					// 		)
+					// 	);
+					// } else {
+					// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+					// 	$this->db->update(
+					// 		'Tr_Field_Value',
+					// 		array(
+					// 			'value' => $dokumen
+					// 		)
+					// 	);
+					// }
+				}
+				echo "<pre>";
+				print_r($this->input->post('dokumen'));
+				echo "</pre>";
+				die();
+				redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 			}
-			echo "<pre>";
-			print_r($this->input->post('dokumen'));
-			echo "</pre>";
-			die();
-			redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 		}
 		// } else {
 		$data['view'] = 'pengajuan/tambah';

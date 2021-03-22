@@ -26,6 +26,11 @@ function field($field_id)
   return $CI->db->get_where('Mstr_Fields', array('field_id' => $field_id))->row_array();
 }
 
+function get_user_session($session_name)
+{
+  $ci = &get_instance();
+  return $ci->session->userdata($session_name);
+}
 function get_mahasiswa_by_nim($nim)
 {
   $CI = &get_instance();
@@ -67,7 +72,7 @@ function field_value_checker($field_value, $id, $verifikasi, $pengajuan_status, 
       //field sudah dicek, tapi perlu direvisi
       if ($verifikasi == 0 && $pengajuan_status == 4) {
         $value = $field_value;
-        $valid = '';
+        $valid = 'is-invalid';
         $disabled = 'en';
       } else {
         $value = $field_value;
@@ -202,7 +207,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
               ?>
               <strong><?= ($file) ? $filename['1'] : ''; ?></strong> <span class="text-muted"></span>
             </p>
-            <div class="buttonedit"> <a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url($file['file']); ?>'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser-<?= $id; ?> btn btn-sm btn-danger <?= ($verifikasi == 0 && $pengajuan_status == 5 || $pengajuan_status == 7) ? 'd-none' : ''; ?>' data-id='<?= $file['id']; ?>'> <i class='fas fa-pencil-alt'></i> Ganti</a></div>
+            <div class="buttonedit"> <a class='btn btn-sm btn-warning' target='_blank' href='<?= base_url($file['file']); ?>'><i class='fas fa-eye'></i> Lihat</a> <a href='<?= base_url($fungsi_upload); ?>/hapus_file/' class='deleteUser-<?= $id; ?> btn btn-sm btn-danger <?= $form; ?>' data-id='<?= $file['id']; ?>'> <i class='fas fa-pencil-alt'></i> Ganti</a></div>
           </div>
         </li>
       </ul>
@@ -315,6 +320,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
   <?php } elseif ($fields['type'] == 'text') {
     $check = field_value_checker($field_value, $id, $verifikasi, $pengajuan_status, false);
+
   ?>
 
     <fieldset <?= $check['disabled'];  ?>>
@@ -432,14 +438,16 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
       }
     }
 
+
   ?>
 
-    <?php print_r(set_select('dokumen[' . $id . ']')); ?>
+
     <fieldset>
       <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= $valid; ?>" name="dokumen[<?= $id; ?>][]" multiple <?= $disabled; ?>>
+        <option locked="locked" value="<?= get_user_session('studentid'); ?>"><?php echo get_mahasiswa_by_nim(get_user_session('studentid'))['FULLNAME']; ?> (<?php echo get_mahasiswa_by_nim(get_user_session('studentid'))['STUDENTID']; ?>)</option>
         <?php if ($value) {
           foreach ($value as $anggota) { ?>
-            <option value="<?= $anggota; ?>"><?php echo get_mahasiswa_by_nim($anggota)['FULLNAME']; ?></option>
+            <option value="<?= $anggota; ?>"><?php echo get_mahasiswa_by_nim($anggota)['FULLNAME']; ?> (<?php echo get_mahasiswa_by_nim($anggota)['STUDENTID']; ?>)</option>
         <?php }
         } ?>
 
@@ -451,7 +459,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     <script>
       $(document).ready(function() {
 
-        var selectedValuesTest = [
+        var selectedValuesTest = [<?= get_user_session('studentid'); ?>,
           <?php if ($value) {
             foreach ($value as $anggota) {
               echo '"' . $anggota . '"' . ',';
@@ -681,18 +689,7 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
     $anggota_array = explode(",", $anggota_string);
     ?>
 
-    <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> <?= (form_error('dokumen[' . $id . ']')) ? 'is-invalid' : ''; ?> <?= (($fields['verifikasi'] == 0) && ($pengajuan_status == 4)) ? 'is-invalid' : ''; ?>" <?= ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) ? "" : "disabled"; ?> value="<?= (validation_errors()) ? set_value('dokumen[' . $id . ']') :  $fields['value'];  ?>" name="dokumen[<?= $id; ?>][]" multiple>
-      <?php
-      if ($pengajuan_status == 1 && $fields['verifikasi'] == 0 || $pengajuan_status == 4 && $fields['verifikasi'] == 0) {
-      } else {
-      ?>
-        <?php foreach ($anggota_array as $anggota) { ?>
-          <option value="<?= $anggota; ?>"><?php get_mahasiswa_by_nim($anggota); ?></option>
-        <?php } ?>
-      <?php
-      }
-      ?>
-    </select> -->
+
     <table class="table table-striped table-bordered">
 
       <?php $i = 1;

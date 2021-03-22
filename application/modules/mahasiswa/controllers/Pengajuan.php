@@ -244,7 +244,8 @@ class Pengajuan extends Mahasiswa_Controller
 			"SELECT * FROM Tr_Pengajuan_Field pf
 			LEFT JOIN Mstr_Fields f ON f.field_id = pf.field_id
 			WHERE pf.Jenis_Pengajuan_Id = $pengajuan->Jenis_Pengajuan_Id
-			AND pf.terpakai = 1"
+			AND pf.terpakai = 1
+			ORDER BY urutan ASC"
 		)->result_array();
 
 		$data['timeline'] = $this->db->query(

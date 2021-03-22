@@ -50,6 +50,17 @@ class Pengajuan extends Mahasiswa_Controller
 		$this->load->view('layout/layout', $data);
 	}
 
+	public function prestasi_saya()
+	{
+		$data['title'] = 'Pengajuan Saya';
+		// $data['view'] = 'pengajuan/prestasi_saya';
+		$data = $this->pengajuan_model->getPrestasiSaya();
+		echo "<pre>";
+		print_r($data);
+		echo "</pre>";
+		// $this->load->view('layout/layout', $data);
+	}
+
 	public function index($id_jenis_pengajuan = 0)
 	{
 		if ($id_jenis_pengajuan == 0) {
@@ -153,6 +164,60 @@ class Pengajuan extends Mahasiswa_Controller
 	}
 
 	public function getPengajuanSaya($id_jenis_pengajuan = 0)
+	{
+		// $search = $this->input->post('search');
+		$result_anggota = $this->pengajuan_model->getPengajuanSaya($id_jenis_pengajuan);
+
+		if (count($result_anggota) > 0) {
+			foreach ($result_anggota as $anggota) {
+				$selectajax[] = [
+					'pengajuan_id' => $anggota['pengajuan_id'],
+					'judul_karya' =>
+					"<a href='"
+						. base_url('mahasiswa/pengajuan/tambah/'
+							. $anggota['pengajuan_id'])
+						. "'>"
+						. get_meta_value('judul', $anggota['pengajuan_id'], false)
+						. "<br>"
+						. $anggota['Jenis_Pengajuan']
+						. "</a>",
+					'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
+					'nim' => $anggota['nim'],
+					'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],
+					'FULLNAME' => $anggota['FULLNAME'],
+					'NAME_OF_FACULTY' => $anggota['NAME_OF_FACULTY'],
+					'DEPARTMENT_ID' => $anggota['DEPARTMENT_ID'],
+					'pic' => $anggota['pic'],
+					'status_id' => $anggota['status_id'],
+					'date' => $anggota['date'],
+					'status' => $anggota['status'],
+					'badge' => $anggota['badge'],
+					'time' => $anggota['time'],
+				];
+				$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
+			}
+		} else {
+			$selectajax[] = [
+				'pengajuan_id' => "data kosong",
+				'judul_karya' => "data kosong",
+				'Jenis_Pengajuan_Id' => "data kosong",
+				'nim' => "data kosong",
+				'Jenis_Pengajuan' => "data kosong",
+				'FULLNAME' => "data kosong",
+				'NAME_OF_FACULTY' => "data kosong",
+				'DEPARTMENT_ID' => "data kosong",
+				'pic' => "data kosong",
+				'status_id' => "data kosong",
+				'date' => "data kosong",
+				'status' => "data kosong",
+				'badge' => "data kosong",
+				'time' => "data kosong",
+			];
+			$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
+		}
+	}
+
+	public function getPrestasiSaya($id_jenis_pengajuan = 0)
 	{
 		// $search = $this->input->post('search');
 		$result_anggota = $this->pengajuan_model->getPengajuanSaya($id_jenis_pengajuan);

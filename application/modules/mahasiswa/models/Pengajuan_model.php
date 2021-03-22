@@ -152,6 +152,51 @@ class Pengajuan_model extends CI_Model
 
 		// return $this->db->query("SELECT * FROM V_Mahasiswa")->result_array();
 	}
+
+	function getPrestasiSaya($id_jenis_pengajuan = 0)
+	{
+		$nim = $_SESSION['studentid'];
+
+		$query = $this->db->get_where(
+			'Tr_Penerbitan_Pengajuan',
+			[
+				'STUDENTID' => $nim
+			]
+		)->result_object();
+
+		return $query;
+
+		// foreach ($query as $query) {
+		// 	return $query;
+		// }
+
+		// foreach ($query as $pengajuan) {
+		// 	$id_pengajuan = $pengajuan->id_pengajuan;
+
+		// 	return $this->db->query(
+		// 		"SELECT 
+		// 		p.*,
+		// 		jp.Jenis_Pengajuan,
+		// 		m.FULLNAME,
+		// 		m.NAME_OF_FACULTY,
+		// 		m.DEPARTMENT_ID,
+		// 		ps.pic,
+		// 		ps.status_id,
+		// 		ps.date,
+		// 		s.status,
+		// 		s.status_id,
+		// 		s.badge,
+		// 		FORMAT (ps.date, 'hh:mm:ss ') as time
+		// 		FROM Tr_Pengajuan p 
+		// 		LEFT JOIN Mstr_Jenis_Pengajuan jp ON p.Jenis_Pengajuan_Id = jp.Jenis_Pengajuan_Id
+		// 		LEFT JOIN V_Mahasiswa m ON m.STUDENTID = p.nim
+		// 		LEFT JOIN Tr_Pengajuan_Status ps ON ps.pengajuan_id = p.pengajuan_id
+		// 		LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
+		// 		WHERE p.pengajuan_id = '$id_pengajuan' "
+		// 	)->result_array();
+		// }
+	}
+
 	// AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan
 	public function getPembimbing($search)
 	{

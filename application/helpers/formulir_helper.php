@@ -22,8 +22,8 @@ function call_scripts()
 
 function field($field_id)
 {
-  $CI = &get_instance();
-  return $CI->db->get_where('Mstr_Fields', array('field_id' => $field_id))->row_array();
+	$CI = &get_instance();
+	return $CI->db->get_where('Mstr_Fields', array('field_id' => $field_id))->row_array();
 }
 
 function get_user_session($session_name)
@@ -33,21 +33,21 @@ function get_user_session($session_name)
 }
 function get_mahasiswa_by_nim($nim)
 {
-  $CI = &get_instance();
-  $query = $CI->db->get_where('V_Mahasiswa', array('STUDENTID' => $nim))->row_array();
-  return $query;
+	$CI = &get_instance();
+	$query = $CI->db->get_where('V_Mahasiswa', array('STUDENTID' => $nim))->row_array();
+	return $query;
 }
 function get_dosen_by_id($id)
 {
-  $CI = &get_instance();
-  $query = $CI->db->get_where('V_Dosen', array('id_pegawai' => $id))->row_array();
-  return $query;
+	$CI = &get_instance();
+	$query = $CI->db->get_where('V_Dosen', array('id_pegawai' => $id))->row_array();
+	return $query;
 }
 function get_prodi_by_id($id)
 {
-  $CI = &get_instance();
-  $query = $CI->db->get_where('Mstr_Department', array('DEPARTMENT_ID' => $id))->row_array();
-  return $query;
+	$CI = &get_instance();
+	$query = $CI->db->get_where('Mstr_Department', array('DEPARTMENT_ID' => $id))->row_array();
+	return $query;
 }
 
 function field_value_checker($field_value, $id, $verifikasi, $pengajuan_status, $array)
@@ -849,18 +849,18 @@ function generate_keterangan_surat($field_id, $id_surat, $pengajuan_status)
 
 function get_file_name($file_dir = 0)
 {
-  $file_name = explode("/", $file_dir);
-  echo $file_name[2];
+	$file_name = explode("/", $file_dir);
+	echo $file_name[2];
 }
 
 function get_meta_name($key)
 {
-  $CI = &get_instance();
-  $name = $CI->db->select("kat_keterangan_surat")
-    ->from('kat_keterangan_surat')
-    ->where(array('key' => $key))
-    ->get()
-    ->row_array()['kat_keterangan_surat'];
+	$CI = &get_instance();
+	$name = $CI->db->select("kat_keterangan_surat")
+		->from('kat_keterangan_surat')
+		->where(array('key' => $key))
+		->get()
+		->row_array()['kat_keterangan_surat'];
 
-  return $name;
+	return $name;
 }

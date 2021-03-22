@@ -152,6 +152,56 @@ class Pengajuan_model extends CI_Model
 
 		// return $this->db->query("SELECT * FROM V_Mahasiswa")->result_array();
 	}
+
+	function getPrestasiSaya($id_jenis_pengajuan = 0)
+	{
+		$nim = $_SESSION['studentid'];
+
+		$query = $this->db->get_where(
+			'Tr_Penerbitan_Pengajuan',
+			[
+				'STUDENTID' => $nim
+			]
+		)->result_object();
+
+		foreach ($query as $query) {
+			$var[] = $query->id_pengajuan;
+		}
+
+		return $var;
+	}
+
+	public function detailPrestasi($id_pengajuan)
+	{
+		$nim = $_SESSION['studentid'];
+
+		$id_status_pengajuan = $this->db
+			->select_max('status_pengajuan_id')
+			->from('Tr_Pengajuan_Status')
+			->where(['pengajuan_id' => $id_pengajuan])
+			->get()
+			->row_object()->status_pengajuan_id;
+
+		$pengajuan = $this->db
+			->select('*')
+			->from('Tr_Pengajuan p')
+			->join('Mstr_Jenis_Pengajuan jp', 'p.Jenis_Pengajuan_Id = jp.Jenis_Pengajuan_Id')
+			->join('V_Mahasiswa m', 'm.STUDENTID = p.nim')
+			->join('Tr_Pengajuan_Status ps', 'ps.pengajuan_id = p.pengajuan_id')
+			->join('Tr_Status s', 's.status_id = ps.status_id')
+			->where(
+				[
+					'p.pengajuan_id' => $id_pengajuan,
+					'p.nim' => $nim,
+					'ps.status_pengajuan_id' => $id_status_pengajuan
+				]
+			)
+			->get()
+			->row_array();
+
+		return $pengajuan;
+	}
+
 	// AND p.Jenis_Pengajuan_Id = $id_jenis_pengajuan
 	public function getPembimbing($search)
 	{

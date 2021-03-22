@@ -50,6 +50,18 @@ class Pengajuan extends Mahasiswa_Controller
 		$this->load->view('layout/layout', $data);
 	}
 
+	public function prestasi_saya()
+	{
+		$data['title'] = 'Pengajuan Saya';
+		$data['view'] = 'pengajuan/prestasi_saya';
+
+		// echo "<pre>";
+		// print_r($dummy);
+		// echo "</pre>";
+
+		$this->load->view('layout/layout', $data);
+	}
+
 	public function index($id_jenis_pengajuan = 0)
 	{
 		if ($id_jenis_pengajuan == 0) {
@@ -206,6 +218,70 @@ class Pengajuan extends Mahasiswa_Controller
 		}
 	}
 
+	public function getPrestasiSaya($id_jenis_pengajuan = 0)
+	{
+		$query = $this->pengajuan_model->getPrestasiSaya();
+
+		foreach ($query as $pengajuan) {
+			$dummy[] = $this->pengajuan_model->detailPrestasi($pengajuan);
+		}
+
+		echo "<pre>";
+		print_r($dummy);
+		echo "</pre>";
+
+		// $search = $this->input->post('search');
+		// $result_anggota = $this->pengajuan_model->getPengajuanSaya($id_jenis_pengajuan);
+
+		// if (count($result_anggota) > 0) {
+		// 	foreach ($result_anggota as $anggota) {
+		// 		$selectajax[] = [
+		// 			'pengajuan_id' => $anggota['pengajuan_id'],
+		// 			'judul_karya' =>
+		// 			"<a href='"
+		// 				. base_url('mahasiswa/pengajuan/tambah/'
+		// 					. $anggota['pengajuan_id'])
+		// 				. "'>"
+		// 				. get_meta_value('judul', $anggota['pengajuan_id'], false)
+		// 				. "<br>"
+		// 				. $anggota['Jenis_Pengajuan']
+		// 				. "</a>",
+		// 			'Jenis_Pengajuan_Id' => $anggota['Jenis_Pengajuan_Id'],
+		// 			'nim' => $anggota['nim'],
+		// 			'Jenis_Pengajuan' => $anggota['Jenis_Pengajuan'],
+		// 			'FULLNAME' => $anggota['FULLNAME'],
+		// 			'NAME_OF_FACULTY' => $anggota['NAME_OF_FACULTY'],
+		// 			'DEPARTMENT_ID' => $anggota['DEPARTMENT_ID'],
+		// 			'pic' => $anggota['pic'],
+		// 			'status_id' => $anggota['status_id'],
+		// 			'date' => $anggota['date'],
+		// 			'status' => $anggota['status'],
+		// 			'badge' => $anggota['badge'],
+		// 			'time' => $anggota['time'],
+		// 		];
+		// 		$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
+		// 	}
+		// } else {
+		// 	$selectajax[] = [
+		// 		'pengajuan_id' => "data kosong",
+		// 		'judul_karya' => "data kosong",
+		// 		'Jenis_Pengajuan_Id' => "data kosong",
+		// 		'nim' => "data kosong",
+		// 		'Jenis_Pengajuan' => "data kosong",
+		// 		'FULLNAME' => "data kosong",
+		// 		'NAME_OF_FACULTY' => "data kosong",
+		// 		'DEPARTMENT_ID' => "data kosong",
+		// 		'pic' => "data kosong",
+		// 		'status_id' => "data kosong",
+		// 		'date' => "data kosong",
+		// 		'status' => "data kosong",
+		// 		'badge' => "data kosong",
+		// 		'time' => "data kosong",
+		// 	];
+		// 	$this->output->set_content_type('application/json')->set_output(json_encode($selectajax));
+		// }
+	}
+
 	public function getPembimbing()
 	{
 		$search = $this->input->post('search');
@@ -266,17 +342,12 @@ class Pengajuan extends Mahasiswa_Controller
 		$data['title'] =  $pengajuan->jenis_pengajuan;
 
 		if ($this->input->post("submit")) {
-
 			$id_status =	$this->input->post('status');
-
 			if ($id_status == 1) {
 				$next_status = 2;
 			} elseif ($id_status == 4) {
 				$next_status = 5;
 			}
-
-			//echo $id_status;
-
 			$data_user = $this->session->userdata('user_id');
 
 			foreach ($pengajuan_fields as $pengajuan_field) {
@@ -290,51 +361,44 @@ class Pengajuan extends Mahasiswa_Controller
 				);
 			}
 
-
 			if ($this->form_validation->run() == false) {
 				$data['pengajuan_fields'] = $pengajuan_fields;
 				$data['pengajuan_status'] = $pengajuan->status_id;
 				$data['pengajuan_id'] = $pengajuan->pengajuan_id;
 				$data['title'] =  $pengajuan->jenis_pengajuan;
-				$data['view'] = 'pengajuan/tambah';
-				$this->load->view('layout/layout', $data);
 			} else {
 
-				if ($id_status == 1 || $id_status == 4) {
-					$insert = $this->db->set('pengajuan_id', $pengajuan_id)
-						->set('status_id', $next_status)
-						->set('pic', $data_user['STUDENTID'])
-						->set('date', date('Y-m-d h:m:s'))
-						->insert('Tr_Pengajuan_Status');
-				}
-
 				foreach ($this->input->post('dokumen') as $id => $dokumen) {
-					if (is_array($dokumen)) {
-						$anggota = implode(",", $dokumen);
-						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-						$this->db->update(
-							'Tr_Field_Value',
-							array(
-								'value' => $anggota
-							)
-						);
-					} else {
-						$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
-						$this->db->update(
-							'Tr_Field_Value',
-							array(
-								'value' => $dokumen
-							)
-						);
-					}
+					// if (is_array($dokumen)) {
+					// 	$anggota = implode(",", $dokumen);
+					// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+					// 	$this->db->update(
+					// 		'Tr_Field_Value',
+					// 		array(
+					// 			'value' => $anggota
+					// 		)
+					// 	);
+					// } else {
+					// 	$this->db->where(array('field_id' => $id, 'pengajuan_id' => $pengajuan_id));
+					// 	$this->db->update(
+					// 		'Tr_Field_Value',
+					// 		array(
+					// 			'value' => $dokumen
+					// 		)
+					// 	);
+					// }
 				}
-
+				echo "<pre>";
+				print_r($this->input->post('dokumen'));
+				echo "</pre>";
+				die();
 				redirect(base_url('mahasiswa/pengajuan/tambah/' . $pengajuan_id));
 			}
-		} else {
-			$data['view'] = 'pengajuan/tambah';
-			$this->load->view('layout/layout', $data);
 		}
+		// } else {
+		$data['view'] = 'pengajuan/tambah';
+		$this->load->view('layout/layout', $data);
+		// }
 	}
 
 	public function doupload()
@@ -412,21 +476,6 @@ class Pengajuan extends Mahasiswa_Controller
 					'filename' => $data['file_name']
 				]
 			);
-
-
-			// $this->_create_thumbs($data['file_name']);
-
-			// // $result = 
-			// $this->db->insert(
-			// 	'Tr_Media',
-			// 	array(
-			// 		'nim' => $this->session->userdata('studentid'),
-			// 		'file' =>  $upload_path . '/' . $data['file_name'],
-			// 		'thumb' =>  $upload_path . '/' . $data['raw_name'] . '_thumb' . $data['file_ext']
-			// 	)
-			// );
-
-
 		}
 	}
 

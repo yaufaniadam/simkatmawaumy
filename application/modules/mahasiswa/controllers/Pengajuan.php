@@ -251,11 +251,12 @@ class Pengajuan extends Mahasiswa_Controller
 		$data['timeline'] = $this->db->query(
 			"SELECT 
 			*,
-			FORMAT (ps.date, 'dd/MM/yyyy') as date,
+			FORMAT (ps.date, 'dd/MM') as date,
 			FORMAT (ps.date, 'hh:mm:ss') as time 
 			FROM Tr_Pengajuan_Status ps
 			LEFT JOIN Tr_Status s ON s.status_id = ps.status_id
-			WHERE ps.pengajuan_id = $pengajuan->pengajuan_id"
+			WHERE ps.pengajuan_id = $pengajuan->pengajuan_id
+			ORDER BY status_pengajuan_id DESC"
 		)->result_array();
 
 		// $data['pengajuan'] = $this->pengajuan_model->get_detail_pengajuan($pengajuan_id);

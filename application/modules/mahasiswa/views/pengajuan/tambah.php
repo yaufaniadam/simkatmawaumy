@@ -74,15 +74,22 @@
 			</a>
 			<div class="collapse show" id="collStatus">
 				<div class="card-body pl-2">
-					<ul class="timeline">
+
+					<div class="timeline timeline-xs">
 						<?php foreach ($timeline as $tl) { ?>
-							<li>
-								<span class="badge badge-<?= $tl['badge']; ?>"><?= $tl['status']; ?></span>
-								<span class="badge badge-secondary"><?= $tl['date']; ?></span>
-								<span class="badge badge-perak"><?= $tl['time']; ?></span>
-							</li>
+							<div class="timeline-item">
+								<div class="timeline-item-marker">
+									<div class="timeline-item-marker-text"><?= $tl['date']; ?></div>
+									<div class="timeline-item-marker-indicator bg-<?= $tl['badge']; ?>"></div>
+								</div>
+								<div class="timeline-item-content">
+									<?= $tl['status']; ?>
+									<span class="badge badge-perak"><?= $tl['time']; ?></span>
+								</div>
+							</div>
 						<?php } ?>
-					</ul>
+					</div>
+
 				</div>
 			</div>
 		</div>

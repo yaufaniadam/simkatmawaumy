@@ -149,6 +149,7 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
     } else {
       //tampilan default, saat value field 0, atau field sudah ada isinya dan menunggu verifikasi
       if ($field_value) {
+
         //field sudah dicek, tapi perlu direvisi
         if ($verifikasi == 0 && $pengajuan_status == 4) {
           //field memiliki isi
@@ -444,11 +445,14 @@ function generate_form_field($field_id, $pengajuan_id, $pengajuan_status, $fungs
 
     <fieldset>
       <select class="js-data-example-ajax form-control form-control-lg <?= $fields['key']; ?> form-control <?= $valid; ?>" name="dokumen[<?= $id; ?>][]" multiple <?= $disabled; ?>>
-        <option locked="locked" value="<?= get_user_session('studentid'); ?>"><?php echo get_mahasiswa_by_nim(get_user_session('studentid'))['FULLNAME']; ?> (<?php echo get_mahasiswa_by_nim(get_user_session('studentid'))['STUDENTID']; ?>)</option>
         <?php if ($value) {
           foreach ($value as $anggota) { ?>
             <option value="<?= $anggota; ?>"><?php echo get_mahasiswa_by_nim($anggota)['FULLNAME']; ?> (<?php echo get_mahasiswa_by_nim($anggota)['STUDENTID']; ?>)</option>
-        <?php }
+          <?php }
+        } else { ?>
+          <option locked="locked" value="<?= get_user_session('studentid'); ?>"><?php echo get_mahasiswa_by_nim(get_user_session('studentid'))['FULLNAME']; ?> (<?php echo get_mahasiswa_by_nim(get_user_session('studentid'))['STUDENTID']; ?>)</option>
+
+        <?php
         } ?>
 
       </select>

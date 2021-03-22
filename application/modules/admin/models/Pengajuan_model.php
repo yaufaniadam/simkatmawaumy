@@ -204,13 +204,18 @@ class Pengajuan_model extends CI_Model
 		$not_exist_fields_data = $dataFieldCheck['not_exist_fields_data'];
 		$sent_fields_data = $dataFieldCheck['sent_fields_data'];
 
-		foreach ($sent_fields_data as $field) {
+		foreach ($sent_fields_data as $key => $field) {
 
 			$data = [
 				'Jenis_Pengajuan_Id' => $id,
 				'field_id' => $field,
-				'terpakai' => 1
+				'terpakai' => 1,
+				'urutan' => $key
 			];
+
+			echo '<pre>';
+			print_r($data);
+			echo '</pre>';
 
 			// menambahkan field yang belum ada
 			$datafield_exist = $this->db->query(
@@ -224,7 +229,8 @@ class Pengajuan_model extends CI_Model
 				$this->db->insert('Tr_Pengajuan_Field', $data);
 			} else {
 				$field_property = [
-					'terpakai' => 1
+					'terpakai' => 1,
+					'urutan' => $key
 				];
 
 				$this->db->update(
@@ -272,9 +278,14 @@ class Pengajuan_model extends CI_Model
 		// return $datafield_exist;
 	}
 
-	public function tambah($data)
+	public function tambah_field_pengajuan($data)
 	{
-		return $this->db->insert('pengajuan', $data);
+		return $this->db->insert('Tr_Pengajuan_Field', $data);
+	}
+
+	public function tambah_jenis_pengajuan($data)
+	{
+		return $this->db->insert('Mstr_Jenis_Pengajuan', $data);
 	}
 
 	public function get_pengajuan_status($id_pengajuan)

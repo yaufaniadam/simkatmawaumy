@@ -16,35 +16,12 @@ class Jenispengajuan extends Admin_Controller
 		$data['view'] = 'jenispengajuan/index';
 		$this->load->view('layout/layout', $data);
 	}
+
 	public function tambah()
-	{
-		$data['view'] = 'admin/borang/kategori/tambah_kategori';
-		$this->load->view('admin/layout', $data);
-	}
-
-
-	public function edit($id)
 	{
 
 		if ($this->input->post('submit')) {
-			// $this->form_validation->set_rules(
-			// 	'jenis_pengajuan',
-			// 	'Kategori',
-			// 	'trim|required',
-			// 	array('required' => '%s wajib diisi.')
-			// );
-			// $this->form_validation->set_rules(
-			// 	'kode',
-			// 	'Kode',
-			// 	'trim|required',
-			// 	array('required' => '%s wajib diisi.')
-			// );
-			// $this->form_validation->set_rules(
-			// 	'klien',
-			// 	'Pengguna',
-			// 	'trim|required',
-			// 	array('required' => '%s wajib diisi.')
-			// );
+
 			$this->form_validation->set_rules(
 				'deskripsinya',
 				'Deskripsi',
@@ -57,41 +34,102 @@ class Jenispengajuan extends Admin_Controller
 				'trim|required',
 				array('required' => '%s wajib diisi.')
 			);
-			// $this->form_validation->set_rules(
-			// 	'kat_keterangan_surat[]',
-			// 	'Formulir Isian',
-			// 	'required',
-			// 	array('required' => '%s wajib diisi.')
-			// );
-			// $this->form_validation->set_rules(
-			// 	'template',
-			// 	'Template',
-			// 	'required',
-			// 	array('required' => '%s wajib diisi.')
-			// );
+
+			// echo '<pre>';
+			// print_r($this->input->post());
+			// echo '</pre>';
+
+			if ($this->form_validation->run() == FALSE) {
+				$data['all_fields'] = $this->pengajuan_model->getAllFieldsPengajuan();
+				$data['title'] = 'Tambah Jenis Pengajuan';
+				$data['view'] = 'jenispengajuan/tambah';
+				$this->load->view('layout/layout', $data);
+			} else {
+
+				$data = array(
+					'jenis_pengajuan' => $this->input->post('Jenis_Pengajuan'),
+					'deskripsi' => $this->input->post('deskripsinya'),
+				);
+
+
+				$result = $this->pengajuan_model->tambah_jenis_pengajuan($data);
+				$id = $this->db->insert_id();
+				if ($result) {
+					$fields = $this->input->post('fields');
+					$expl = explode('&', $fields);
+					foreach ($expl as $key => $exp) {
+						$exp = explode("=", $exp);
+						echo $key . "=>" . $exp[1] . "<br>";
+
+						$insert_field = array(
+							'Jenis_Pengajuan_Id' => $id,
+							'field_id' => $exp[1],
+							'terpakai' => 1,
+							'urutan' => $key
+						);
+
+						$this->pengajuan_model->tambah_field_pengajuan($insert_field);
+
+						echo '<pre>';
+						print_r($insert_field);
+						echo '</pre>';
+					}
+
+					$this->session->set_flashdata('msg', 'Kategori Pengajuan berhasil ditambah!');
+					redirect(base_url('admin/jenispengajuan/edit/' . $id));
+				}
+			}
+		} else {
+			$data['all_fields'] = $this->pengajuan_model->getAllFieldsPengajuan();
+			$data['title'] = 'Tambah Jenis Pengajuan';
+			$data['view'] = 'jenispengajuan/tambah';
+			$this->load->view('layout/layout', $data);
+		}
+	}
+
+	public function edit($id)
+	{
+
+		if ($this->input->post('submit')) {
+
+			$this->form_validation->set_rules(
+				'deskripsinya',
+				'Deskripsi',
+				'trim|required',
+				array('required' => '%s wajib diisi.')
+			);
+			$this->form_validation->set_rules(
+				'Jenis_Pengajuan',
+				'Nama Jenis Pengajuan',
+				'trim|required',
+				array('required' => '%s wajib diisi.')
+			);
 
 			if ($this->form_validation->run() == FALSE) {
 				$data['kategori'] = $this->pengajuan_model->get_jenis_pengajuan_byid($id);
 				$data['all_fields'] = $this->pengajuan_model->getAllFieldsPengajuan();
 				$data['fields_pengajuan'] = $this->pengajuan_model->getAllFieldsPengajuan();
-				//	$data['keterangan_surat'] = $this->pengajuan_model->get_kat_keterangan_surat();
-				//	$data['title'] = 'Edit Jenis Pengajuan';
+
 				$data['view'] = 'jenispengajuan/edit';
 				$this->load->view('layout/layout', $data);
 			} else {
 
 				$data = array(
 					'jenis_pengajuan' => $this->input->post('Jenis_Pengajuan'),
-					// 'kode' => $this->input->post('kode'),
-					// 'klien' => $this->input->post('klien'),
 					'deskripsi' => $this->input->post('deskripsinya'),
-					// 'tujuan_surat' => $this->input->post('tujuan_surat'),
-					// 'template' => $this->input->post('template'),
 				);
 
+				$fields = $this->input->post('fields');
+				$expl = explode('&', $fields);
+				$arr = array();
+				foreach ($expl as $key => $exp) {
+					$exp = explode("=", $exp);
+					$arr[] = $exp[1];
+				}
+
 				$dataFieldCheck = [
-					'not_exist_fields_data' => implode(',', $this->input->post("kat_keterangan_surat[]")),
-					'sent_fields_data' => $this->input->post("kat_keterangan_surat[]"),
+					'not_exist_fields_data' => implode(',', $arr),
+					'sent_fields_data' => $arr,
 				];
 
 				// print_r($data);
@@ -103,28 +141,12 @@ class Jenispengajuan extends Admin_Controller
 					$this->session->set_flashdata('msg', 'Data kategory berhasil diubah!');
 					redirect(base_url('admin/jenispengajuan/edit/' . $id));
 				}
-
-
-				// $ssj = $this->input->post("kat_keterangan_surat[]");
-				// print_r($ssj['1']);
-				// $vari = $this->pengajuan_model->editFieldsPengajuan($dataFieldCheck, $id);
-				// foreach ($vari as $vari) {
-				// 	echo "<br>";
-				// 	echo $vari['field_id'];
-				// }
-				// // echo "</pre>";
-
-
-				// echo "<br>";
-				// print_r(implode(',', $this->input->post("kat_keterangan_surat[]")));
-				// echo "<br>";
-				// print_r($dataFieldCheck['sent_fields_data']);
 			}
 		} else {
 			$data['kategori'] = $this->pengajuan_model->get_jenis_pengajuan_byid($id);
 			$data['all_fields'] = $this->pengajuan_model->getAllFieldsPengajuan();
 			$data['fields_pengajuan'] = $this->pengajuan_model->getAllFieldsPengajuan();
-			//	$data['template'] = $scanned_directory;
+
 			$data['title'] = 'Edit Jenis Pengajuan';
 			$data['view'] = 'jenispengajuan/edit';
 			$this->load->view('layout/layout', $data);

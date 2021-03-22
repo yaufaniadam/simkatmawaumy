@@ -202,3 +202,20 @@ border-style: solid;
 .dm-uploader.is-invalid { 
   border: 3px dashed rgb(197, 88, 88); 
 }
+
+/* Select2 */
+
+span.selection>.select2-selection--single {
+  padding: 0.34rem 2.25rem 2rem .2rem;
+}
+
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  top: 5px !important;
+  right: 5px !important;
+}
+
+.is-invalid + span span.selection >  .select2-selection--multiple,
+.is-invalid + span span.selection >  .select2-selection--single {
+  border: 1px solid rgb(197, 88, 88); 
+}
